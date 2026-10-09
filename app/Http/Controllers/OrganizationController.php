@@ -6,6 +6,7 @@ use App\Enums\OrganizationType;
 use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Requests\UpdateOrganizationRequest;
 use App\Models\Organization;
+use App\Support\PageSize;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -29,7 +30,7 @@ class OrganizationController extends Controller
                 ->orWhereLike('tin', "%{$filters['q']}%")))
             ->when($filters['type'], fn ($query, OrganizationType $type) => $query->where('type', $type))
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate(PageSize::for($request))
             ->withQueryString();
 
         return view('organizations.index', [

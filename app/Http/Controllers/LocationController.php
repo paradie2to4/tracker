@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateLocationRequest;
 use App\Models\Location;
 use App\Models\Organization;
 use App\Models\StockMovement;
+use App\Support\PageSize;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -52,7 +53,7 @@ class LocationController extends Controller
                 ->where('quantity', '>', 0)
                 ->with('batch.product')
                 ->orderBy('batch_id')
-                ->paginate(15, pageName: 'stock'),
+                ->paginate(PageSize::for(request(), PageSize::NESTED), pageName: 'stock'),
             'movements' => StockMovement::query()
                 ->where(fn ($query) => $query
                     ->where('from_location_id', $location->getKey())

@@ -53,7 +53,7 @@ class ProductManagementTest extends TestCase
         $response = $this->actingAs($this->staff)->get(route('products.index'));
 
         $response->assertOk();
-        $this->assertCount(15, $response->viewData('products'));
+        $this->assertCount(12, $response->viewData('products'));
         $this->assertSame(20, $response->viewData('products')->total());
     }
 

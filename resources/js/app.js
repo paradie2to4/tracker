@@ -1,3 +1,13 @@
+// Tell the server whether this is a phone-sized screen, so lists can show
+// fewer records per page (see App\Support\PageSize). Size only, no tracking.
+(() => {
+    const compact = window.matchMedia('(max-width: 639px)').matches ? '1' : '0';
+
+    if (!document.cookie.includes(`ps_compact=${compact}`)) {
+        document.cookie = `ps_compact=${compact}; path=/; max-age=31536000; samesite=lax`;
+    }
+})();
+
 // Ask for confirmation before submitting any form marked with data-confirm,
 // e.g. <form method="POST" data-confirm="Recall this batch?">.
 // Server-side authorisation and validation still apply regardless.

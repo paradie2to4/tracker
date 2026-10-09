@@ -180,7 +180,7 @@
                 </ul>
 
                 @if ($movements->hasPages())
-                    <div class="border-t border-ink-200 px-4 py-3">{{ $movements->links() }}</div>
+                    <div class="border-t border-ink-200 px-4 py-3">{{ $movements->onEachSide(1)->links() }}</div>
                 @endif
             @endif
         </section>

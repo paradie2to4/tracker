@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Policies\AuditLogPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -47,6 +48,9 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Gate::policy(AuditLog::class, AuditLogPolicy::class);
+
+        // Themed pagination: compact Previous/Next on phones, numbered pages above.
+        Paginator::defaultView('pagination.productsphere');
 
         Password::defaults(fn () => Password::min(10)->letters()->numbers());
     }

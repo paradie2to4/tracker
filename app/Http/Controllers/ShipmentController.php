@@ -8,6 +8,7 @@ use App\Enums\ShipmentStatus;
 use App\Http\Requests\StoreShipmentRequest;
 use App\Models\Location;
 use App\Models\Shipment;
+use App\Support\PageSize;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -35,7 +36,7 @@ class ShipmentController extends Controller
                 ->orWhere('to_location_id', $locationId)))
             ->latest('dispatched_at')
             ->latest('id')
-            ->paginate(15)
+            ->paginate(PageSize::for($request))
             ->withQueryString();
 
         return view('shipments.index', [

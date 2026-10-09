@@ -74,7 +74,7 @@
             </div>
 
             @if ($balances->hasPages())
-                <div class="border-t border-ink-200 px-4 py-3">{{ $balances->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $balances->onEachSide(1)->links() }}</div>
             @endif
         @endif
     </section>

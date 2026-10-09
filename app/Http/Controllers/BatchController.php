@@ -12,6 +12,7 @@ use App\Models\Batch;
 use App\Models\Location;
 use App\Models\Product;
 use App\Models\ShipmentItem;
+use App\Support\PageSize;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -36,7 +37,7 @@ class BatchController extends Controller
             ->when($filters['status'], fn ($query, BatchStatus $status) => $query->withStatus($status))
             ->orderByDesc('manufacturing_date')
             ->orderByDesc('id')
-            ->paginate(15)
+            ->paginate(PageSize::for($request))
             ->withQueryString();
 
         return view('batches.index', [
@@ -97,7 +98,7 @@ class BatchController extends Controller
                 ->with(['fromLocation', 'toLocation', 'shipment.fromLocation', 'shipment.toLocation', 'user'])
                 ->latest('occurred_at')
                 ->latest('id')
-                ->paginate(15, pageName: 'history'),
+                ->paginate(PageSize::for(request(), PageSize::NESTED), pageName: 'history'),
             'removalReasons' => RemovalReason::cases(),
             'activeLocations' => $batch->origin_location_id === null
                 ? Location::where('is_active', true)->with('organization')->orderBy('code')->get()

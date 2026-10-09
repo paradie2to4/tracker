@@ -68,7 +68,7 @@
             </div>
 
             @if ($organizations->hasPages())
-                <div class="border-t border-ink-200 px-4 py-3">{{ $organizations->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $organizations->onEachSide(1)->links() }}</div>
             @endif
         @endif
     </div>

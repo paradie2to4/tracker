@@ -117,7 +117,7 @@
         </div>
 
         @if ($logs->hasPages())
-            <div class="mt-6">{{ $logs->links() }}</div>
+            <div class="mt-6">{{ $logs->onEachSide(1)->links() }}</div>
         @endif
     @endif
 </x-layouts.app>

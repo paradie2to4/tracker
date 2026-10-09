@@ -7,6 +7,7 @@ use App\Enums\UnitOfMeasure;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Support\PageSize;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -37,7 +38,7 @@ class ProductController extends Controller
             ->when($filters['category'], fn ($query, ProductCategory $category) => $query->where('category', $category))
             ->when($filters['status'], fn ($query, string $status) => $query->where('is_active', $status === 'active'))
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate(PageSize::for($request))
             ->withQueryString();
 
         return view('products.index', [
@@ -76,7 +77,7 @@ class ProductController extends Controller
             'batches' => $product->batches()
                 ->orderByDesc('manufacturing_date')
                 ->orderByDesc('id')
-                ->paginate(10),
+                ->paginate(PageSize::for(request(), PageSize::NESTED)),
         ]);
     }
 

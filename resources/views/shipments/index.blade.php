@@ -79,7 +79,7 @@
             </div>
 
             @if ($shipments->hasPages())
-                <div class="border-t border-ink-200 px-4 py-3">{{ $shipments->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $shipments->onEachSide(1)->links() }}</div>
             @endif
         @endif
     </div>

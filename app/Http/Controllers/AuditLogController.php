@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Support\PageSize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -20,7 +21,7 @@ class AuditLogController extends Controller
             ->when($event !== '', fn ($query) => $query->whereLike('event', "{$event}%"))
             ->latest('created_at')
             ->latest('id')
-            ->paginate(25)
+            ->paginate(PageSize::for($request, PageSize::FEED))
             ->withQueryString();
 
         return view('audit.index', [

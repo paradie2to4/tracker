@@ -84,7 +84,7 @@
             </div>
 
             @if ($batches->hasPages())
-                <div class="border-t border-ink-200 px-4 py-3">{{ $batches->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $batches->onEachSide(1)->links() }}</div>
             @endif
         @endif
     </div>

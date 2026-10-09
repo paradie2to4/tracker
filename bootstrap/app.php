@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PageSize;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // the login rate limiter). '*' trusts only the connecting peer, so
         // spoofed X-Forwarded-For entries added by clients are ignored.
         $middleware->trustProxies(at: '*');
+
+        // Set by JavaScript (viewport size only), so it can't be encrypted.
+        $middleware->encryptCookies(except: [PageSize::COOKIE]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

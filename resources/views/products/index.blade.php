@@ -75,7 +75,7 @@
             </div>
 
             @if ($products->hasPages())
-                <div class="border-t border-ink-200 px-4 py-3">{{ $products->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $products->onEachSide(1)->links() }}</div>
             @endif
         @endif
     </div>
