@@ -87,16 +87,34 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_login_attempts_are_rate_limited(): void
+    public function test_repeated_failed_logins_are_locked_out_with_a_friendly_message(): void
     {
+        $this->freezeTime();
         $user = User::factory()->create();
 
         for ($attempt = 1; $attempt <= 5; $attempt++) {
             $this->post('/login', ['email' => $user->email, 'password' => 'wrong-password']);
         }
 
-        $this->post('/login', ['email' => $user->email, 'password' => 'password'])
-            ->assertTooManyRequests();
+        // Even the correct password is refused while locked out.
+        $this->from('/login')
+            ->post('/login', ['email' => $user->email, 'password' => 'password'])
+            ->assertRedirect('/login')
+            ->assertSessionHasErrors(['email' => __('auth.throttle', ['seconds' => 60])]);
+
+        $this->assertGuest();
+    }
+
+    public function test_successful_logins_do_not_count_towards_the_lockout(): void
+    {
+        // e.g. a room of people on one Wi-Fi network sharing a demo account.
+        $user = User::factory()->create();
+
+        for ($login = 1; $login <= 10; $login++) {
+            $this->post('/login', ['email' => $user->email, 'password' => 'password'])
+                ->assertRedirect('/dashboard');
+            $this->post('/logout');
+        }
 
         $this->assertGuest();
     }

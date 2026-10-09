@@ -36,6 +36,7 @@ RUN apt-get update \
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY docker/php.ini "$PHP_INI_DIR/conf.d/zz-productsphere.ini"
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
+COPY docker/mpm_prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
 RUN a2enmod rewrite headers
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -54,7 +55,8 @@ RUN composer dump-autoload --optimize --no-dev --no-interaction \
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
-    PORT=10000
+    PORT=10000 \
+    APACHE_MAX_REQUEST_WORKERS=8
 
 EXPOSE 10000
 

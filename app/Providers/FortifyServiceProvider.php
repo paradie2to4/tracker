@@ -3,17 +3,16 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 
 /**
  * Fortify provides the login/logout/registration backend (credential check,
  * session regeneration, CSRF-protected routes). This provider supplies the
- * Blade views, the sign-up action and the brute-force protection rate limit.
+ * Blade views and the sign-up action.
+ *
+ * Brute-force protection uses Fortify's built-in failed-attempt limiter
+ * (see 'limiters' in config/fortify.php).
  */
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -33,12 +32,5 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn () => view('auth.login'));
         Fortify::registerView(fn () => view('auth.register'));
         Fortify::createUsersUsing(CreateNewUser::class);
-
-        // Five attempts per minute per email + IP combination.
-        RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
-
-            return Limit::perMinute(5)->by($throttleKey);
-        });
     }
 }

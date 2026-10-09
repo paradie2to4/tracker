@@ -114,8 +114,13 @@ return [
     |
     */
 
+    // No route-level login limiter: Fortify then throttles *failed* attempts
+    // only (5 per minute per email + IP) and clears the count on success.
+    // A route throttle would also count successful logins, so a room of
+    // people sharing one Wi-Fi network and one demo account would lock
+    // each other out after five sign-ins.
     'limiters' => [
-        'login' => 'login',
+        'login' => null,
     ],
 
     /*
