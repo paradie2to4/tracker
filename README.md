@@ -1,58 +1,192 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ProductSphere — Product Traceability Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+ProductSphere is a web application for registering products, recording their
+manufacturing batches, and monitoring stock and expiry. It is the foundation
+of a supply-chain traceability platform designed to be adapted to
+businesses operating in Rwanda.
 
-## About Laravel
+The current release is the **MVP**: authentication, product management,
+batch management and an expiry-aware dashboard. Supply-chain movements are
+planned for the next phase (see [Roadmap](#roadmap)).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Authentication and access**
+- Session-based login and logout (Laravel Fortify), with passwords hashed by bcrypt.
+- Login throttling: 5 attempts per minute per email and IP address.
+- No public registration. Accounts are created by an administrator from the command line.
+- Two roles. **Staff** can view, register and edit products and batches. **Administrators** can also activate/deactivate products and recall batches.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Dashboard**
+- Total products, total batches, expired batches and batches approaching expiry, all calculated from live database records.
+- A list of active batches expiring within the warning window (30 days by default).
 
-## Learning Laravel
+**Products**
+- Paginated list with search by name or code, and filters by category and status.
+- Register, view and edit products. Product codes are unique and case-insensitive.
+- A product's code becomes read-only once batches exist for it.
+- Products are **deactivated, never deleted**. The database refuses to delete a product that has batches.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Batches**
+- Paginated list with search by batch number, and filters by product and status.
+- Register batches for active products only. Batch numbers are unique.
+- Validation: the manufacturing date cannot be in the future, the expiry date cannot precede manufacturing, and quantities must be positive with at most three decimals.
+- The product and batch number are immutable after creation.
+- Administrators can recall a batch with a mandatory reason. Recalled batches are frozen.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Batch status rules
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+A batch's status is **derived, never stored**, so it can never become stale.
 
-## Agentic Development
+| Status | Condition | Precedence |
+|---|---|---|
+| Recalled | An administrator recorded a recall | 1 (highest) |
+| Depleted | Current quantity is zero | 2 |
+| Expired | Expiry date is before today | 3 |
+| Active | None of the above | 4 |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+A batch is still active **on** its expiry date and is expired from the next
+day. "Today" uses the application time zone (`Africa/Kigali`). A recall
+overrides everything because it is safety-critical. Depleted takes precedence
+over expired because an empty batch has no stock left to sell after expiry.
+The same rules exist in PHP (`Batch::status`) and in SQL (`Batch::scopeWithStatus`),
+so lists can be filtered and paginated in the database.
 
-```bash
-composer require laravel/boost --dev
+## Technology stack
 
-php artisan boost:install
+- PHP 8.4, Laravel 13
+- PostgreSQL 17
+- Laravel Fortify (authentication backend) with custom Blade views
+- Blade templates, Tailwind CSS 4, Vite
+- PHPUnit 12
+
+## Data model
+
+```
+users ──< batches.recalled_by        (nullable, ON DELETE SET NULL)
+products ──< batches.product_id      (required, ON DELETE RESTRICT)
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+| Table | Key columns and constraints |
+|---|---|
+| `users` | Laravel defaults + `role` (`admin` / `staff`, CHECK constraint) |
+| `products` | `product_code` UNIQUE, `name`, `description`, `category`, `manufacturer_name`, `unit_of_measure`, `is_active` |
+| `batches` | `batch_number` UNIQUE, `manufacturing_date`, `expiry_date` (nullable), `initial_quantity` / `current_quantity` as `NUMERIC(14,3)`, `recalled_at`, `recall_reason`, `recalled_by` |
 
-## Contributing
+PostgreSQL CHECK constraints enforce, independently of the application:
+initial quantity > 0, 0 ≤ current quantity ≤ initial quantity,
+expiry date ≥ manufacturing date, and a recall always has a reason.
+Quantities use exact `NUMERIC`, never floating point.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Prerequisites
 
-## Code of Conduct
+- PHP 8.3+ with the `pdo_pgsql`, `pgsql`, `mbstring`, `openssl` and `fileinfo` extensions
+- Composer 2
+- Node.js 20+ and npm
+- PostgreSQL 15+
+- Git
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+On Windows, the simplest setup is [php.new](https://php.new), which installs
+PHP, Composer and the Laravel installer.
 
-## Security Vulnerabilities
+## Installation
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+git clone https://github.com/paradie2to4/tracker.git
+cd tracker
+composer install
+npm install
+cp .env.example .env        # PowerShell: Copy-Item .env.example .env
+php artisan key:generate
+```
 
-## License
+### Database setup
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Create a dedicated database user and two databases: one for development and
+one for the automated tests. Run this as the `postgres` superuser.
+`\password` prompts for the new password without echoing it.
+
+```bash
+psql -U postgres -h 127.0.0.1 -c "CREATE ROLE producttrace WITH LOGIN;" -c "\password producttrace" -c "CREATE DATABASE producttrace OWNER producttrace ENCODING 'UTF8' TEMPLATE template0;" -c "CREATE DATABASE producttrace_test OWNER producttrace ENCODING 'UTF8' TEMPLATE template0;"
+```
+
+### Environment configuration
+
+Edit `.env` (never commit it):
+
+| Variable | Purpose |
+|---|---|
+| `DB_CONNECTION=pgsql` | Use PostgreSQL |
+| `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | Development database credentials |
+| `APP_TIMEZONE=Africa/Kigali` | Time zone used to decide what "today" means for expiry |
+| `EXPIRY_WARNING_DAYS=30` | Optional. Size of the approaching-expiry window |
+
+### Run the migrations
+
+```bash
+php artisan migrate
+```
+
+Optionally load demo data (local environment only):
+
+```bash
+php artisan db:seed
+```
+
+The seeder creates `admin@productsphere.test` and `staff@productsphere.test`,
+both with the password `password`, plus sample products and batches in every
+status. These accounts exist only for local development. The seeder refuses
+to run unless `APP_ENV=local`.
+
+### Create a real user account
+
+```bash
+php artisan app:create-user --admin
+```
+
+Omit `--admin` to choose the role interactively. The password is entered at
+a hidden prompt.
+
+## Running the application
+
+```bash
+npm run build
+php artisan serve
+```
+
+Open http://localhost:8000. During front-end development, run `npm run dev`
+in a second terminal for hot reloading instead of `npm run build`.
+
+## Running the tests
+
+```bash
+php artisan test
+```
+
+The tests run against the separate `producttrace_test` database (forced in
+`phpunit.xml`), so `RefreshDatabase` never touches development data. They use
+PostgreSQL rather than SQLite so that the CHECK constraints and
+case-insensitive `ILIKE` search behave exactly as in production.
+
+Coverage includes authentication and route protection, rate limiting,
+dashboard statistics, product and batch validation (duplicates, dates,
+negative and over-precise quantities), search and filters, role-based
+permissions, recall rules, status derivation and direct database
+constraint checks.
+
+> Avoid `php artisan config:cache` during development. A cached
+> configuration would bypass the test database override in `phpunit.xml`.
+
+## Current limitations
+
+- Single organisation: all users see all records. Organisation-level access arrives with Phase 6/7.
+- `current_quantity` is edited manually. It will become read-only once stock movements exist.
+- No password reset or profile page yet (needs a configured mailer).
+- No user-management screen; users are created with `app:create-user`.
+- A recall is irreversible and has no workflow (notifications, affected shipments).
+- No audit trail of edits yet.
+
+## Roadmap
+
+- **Phase 6 — Traceability:** supply-chain organisations and locations, shipment and receipt events, product movement history, transaction-safe stock movements, an append-only audit trail, and rules against invalid transitions.
+- **Phase 7 — Advanced:** QR codes and public product verification, recall workflows and affected-batch reports, role-based organisational access, a documented REST API with authentication and rate limiting, Docker and CI/CD, and optional GS1/EPCIS-based interoperability.
