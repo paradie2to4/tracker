@@ -177,6 +177,42 @@ constraint checks.
 > Avoid `php artisan config:cache` during development. A cached
 > configuration would bypass the test database override in `phpunit.xml`.
 
+## Deployment (Render + Neon)
+
+Production runs as a Docker web service on [Render](https://render.com),
+backed by a [Neon](https://neon.tech) serverless PostgreSQL database.
+
+| File | Purpose |
+|---|---|
+| `Dockerfile` | Multi-stage build: Composer (no dev packages), Node/Vite assets, then PHP 8.4 + Apache with `pdo_pgsql` and OPcache |
+| `docker/start.sh` | Runs on every container start: `php artisan optimize`, then `php artisan migrate --force`, then Apache |
+| `docker/apache.conf`, `docker/php.ini` | Web server (listens on Render's `$PORT`, security headers) and production PHP settings |
+| `render.yaml` | Render Blueprint describing the service and its environment variables |
+
+1. **Neon:** create a project in region *AWS Europe Central 1 (Frankfurt)*.
+   Copy the **direct** (non-pooled) connection string, which ends in `?sslmode=require`.
+2. **App key:** run `php artisan key:generate --show` locally and copy the output.
+3. **Render:** choose *New → Blueprint*, select this repository, then fill in the
+   secret values when prompted:
+   - `DB_URL`: the Neon connection string
+   - `APP_KEY`: the key from step 2
+   - `APP_URL`: the service URL, for example `https://productsphere.onrender.com`
+     (update it after the first deploy if Render assigns a different name)
+4. Render builds the image, the container runs the migrations against Neon, and
+   `/up` is used as the health check. Every push to `main` deploys automatically.
+5. **First administrator:** the free plan has no shell access, so create the account
+   from your own machine, pointed at Neon. `DB_URL` overrides the local
+   `DB_*` settings for that single PowerShell session:
+
+   ```bash
+   $env:DB_URL = "<neon connection string>"; php artisan app:create-user --admin; Remove-Item Env:DB_URL
+   ```
+
+Notes:
+- The free Render plan sleeps after 15 minutes of inactivity. The first request after that takes up to about a minute.
+- Do not run `php artisan db:seed` against production. The seeder refuses to run outside `APP_ENV=local`.
+- Vercel is not used: the app is a server-rendered Laravel monolith with no separate front end to host.
+
 ## Current limitations
 
 - Single organisation: all users see all records. Organisation-level access arrives with Phase 6/7.

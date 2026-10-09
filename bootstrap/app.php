@@ -12,7 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Render (and most PaaS hosts) terminate HTTPS at a load balancer.
+        // Trusting the immediate proxy lets Laravel read X-Forwarded-Proto/For,
+        // so it generates https:// URLs and sees the real client IP (used by
+        // the login rate limiter). '*' trusts only the connecting peer, so
+        // spoofed X-Forwarded-For entries added by clients are ignored.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
