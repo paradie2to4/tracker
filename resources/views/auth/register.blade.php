@@ -24,18 +24,10 @@
                    @error('email') aria-invalid="true" @enderror class="form-control mt-1.5 py-2.5">
         </div>
 
-        <div>
-            <label for="password" class="block text-sm font-medium text-ink-600">Password</label>
-            <input id="password" name="password" type="password" required autocomplete="new-password" aria-describedby="password-hint"
-                   @error('password') aria-invalid="true" @enderror class="form-control mt-1.5 py-2.5">
-            <p id="password-hint" class="mt-1.5 text-xs text-ink-400">At least 10 characters, including letters and numbers.</p>
-        </div>
+        <x-form.password name="password" label="Password" autocomplete="new-password"
+                         hint="At least 10 characters, including letters and numbers." />
 
-        <div>
-            <label for="password_confirmation" class="block text-sm font-medium text-ink-600">Confirm password</label>
-            <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password"
-                   class="form-control mt-1.5 py-2.5">
-        </div>
+        <x-form.password name="password_confirmation" label="Confirm password" autocomplete="new-password" />
 
         <button type="submit" class="btn btn-primary w-full py-3 text-base">Create account</button>
 

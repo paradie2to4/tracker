@@ -14,11 +14,7 @@
                    @error('email') aria-invalid="true" @enderror class="form-control mt-1.5 py-2.5">
         </div>
 
-        <div>
-            <label for="password" class="block text-sm font-medium text-ink-600">Password</label>
-            <input id="password" name="password" type="password" required autocomplete="current-password"
-                   @error('password') aria-invalid="true" @enderror class="form-control mt-1.5 py-2.5">
-        </div>
+        <x-form.password name="password" label="Password" autocomplete="current-password" />
 
         <label class="flex items-center gap-2 text-sm text-ink-600">
             <input type="checkbox" name="remember" value="1" @checked(old('remember')) class="size-4 rounded border-ink-300 text-brand-600 focus:ring-brand-600">
