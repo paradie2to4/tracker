@@ -16,6 +16,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Demo Accounts
+    |--------------------------------------------------------------------------
+    |
+    | Sign-in accounts for presenting the demo, one per role. Passwords are
+    | read from the environment (e.g. Render's dashboard) and never stored in
+    | the repository. When a password is not set, the account still exists as
+    | the actor of the demo history, but nobody can sign in with it.
+    |
+    */
+
+    'demo_accounts' => [
+        'admin' => [
+            'name' => 'Demo Administrator',
+            'email' => env('DEMO_ADMIN_EMAIL', 'admin@productsphere.demo'),
+            'password' => env('DEMO_ADMIN_PASSWORD'),
+        ],
+        'staff' => [
+            'name' => 'Demo Staff Member',
+            'email' => env('DEMO_STAFF_EMAIL', 'staff@productsphere.demo'),
+            'password' => env('DEMO_STAFF_PASSWORD'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Rwanda Districts
     |--------------------------------------------------------------------------
     |

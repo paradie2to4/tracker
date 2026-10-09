@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Demo\SyncDemoAccounts;
 use App\Models\Organization;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Console\Command;
 
 /**
- * Loads the demo supply chain once. Safe to run on every deploy: it does
- * nothing if the demo data is already present. Enabled on Render through
- * SEED_DEMO_DATA=true (see docker/start.sh).
+ * Loads the demo supply chain once and keeps the demo sign-in accounts in
+ * sync with DEMO_ADMIN_PASSWORD / DEMO_STAFF_PASSWORD. Safe to run on every
+ * deploy (see docker/start.sh, enabled with SEED_DEMO_DATA=true).
  */
 class SeedDemoDataCommand extends Command
 {
@@ -21,19 +22,23 @@ class SeedDemoDataCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Load the demo supply chain (once) so visitors have data to explore';
+    protected $description = 'Load the demo supply chain (once) and sync the demo sign-in accounts';
 
-    public function handle(): int
+    public function handle(SyncDemoAccounts $syncDemoAccounts): int
     {
         if (Organization::where('name', DemoDataSeeder::MARKER_ORGANIZATION)->exists()) {
-            $this->info('Demo data is already present. Nothing to do.');
-
-            return self::SUCCESS;
+            $this->info('Demo data is already present.');
+        } else {
+            $this->call('db:seed', ['--class' => DemoDataSeeder::class, '--force' => true]);
+            $this->info('Demo supply chain loaded.');
         }
 
-        $this->call('db:seed', ['--class' => DemoDataSeeder::class, '--force' => true]);
+        $accounts = $syncDemoAccounts->handle();
 
-        $this->info('Demo supply chain loaded.');
+        foreach ($accounts as $key => $user) {
+            $status = filled(config("productsphere.demo_accounts.{$key}.password")) ? 'sign-in enabled' : 'no password set, sign-in disabled';
+            $this->line("Demo {$user->role->label()}: {$user->email} ({$status})");
+        }
 
         return self::SUCCESS;
     }

@@ -190,7 +190,7 @@ cancellation. Every batch status appears.
 | Command | Where | What it does |
 |---|---|---|
 | `php artisan db:seed` | Local only | Creates `admin@productsphere.test` and `staff@productsphere.test` (password `password`), then loads the demo supply chain. Refuses to run unless `APP_ENV=local`. |
-| `php artisan app:seed-demo` | Anywhere, including production | Loads the demo supply chain **once**, and does nothing on later runs. Creates no account with a known password, so visitors explore by signing up. |
+| `php artisan app:seed-demo` | Anywhere, including production | Loads the demo supply chain **once**, and does nothing on later runs. On every run it also syncs the demo accounts `admin@productsphere.demo` (Administrator) and `staff@productsphere.demo` (Staff), whose passwords come from `DEMO_ADMIN_PASSWORD` / `DEMO_STAFF_PASSWORD`. If those are unset, nobody can sign in with them. |
 
 `DemoDataSeeder` uses only the real action classes (no Faker, which is not
 installed in production), so its ledger and audit trail are exactly what the

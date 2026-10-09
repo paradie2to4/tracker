@@ -5,6 +5,22 @@
         </div>
     @endif
 
+    @php($demoAccounts = collect(config('productsphere.demo_accounts'))->filter(fn ($account) => filled($account['password'])))
+    @if ($demoAccounts->isNotEmpty())
+        <div class="mb-6 rounded-3xl bg-brand-100 px-5 py-4 text-sm text-brand-900">
+            <p class="font-medium">Demo accounts</p>
+            <ul class="mt-2 space-y-1">
+                @foreach ($demoAccounts as $role => $account)
+                    <li class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="font-mono text-xs">{{ $account['email'] }}</span>
+                        <span class="chip bg-surface py-0.5 text-xs">{{ ucfirst($role) }}</span>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="mt-2 text-xs text-brand-800/70">Ask the presenter for the password, or create your own free account.</p>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('login') }}" class="space-y-5" novalidate>
         @csrf
 

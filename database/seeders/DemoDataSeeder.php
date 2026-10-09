@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Actions\Batches\RecallBatch;
 use App\Actions\Batches\RegisterBatch;
+use App\Actions\Demo\SyncDemoAccounts;
 use App\Actions\Shipments\CancelShipment;
 use App\Actions\Shipments\DispatchShipment;
 use App\Actions\Shipments\ReceiveShipment;
@@ -13,7 +14,6 @@ use App\Enums\OrganizationType;
 use App\Enums\ProductCategory;
 use App\Enums\RemovalReason;
 use App\Enums\UnitOfMeasure;
-use App\Enums\UserRole;
 use App\Models\Batch;
 use App\Models\Location;
 use App\Models\Organization;
@@ -23,15 +23,15 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * A realistic, fictional Rwandan supply chain for demonstrations.
  *
  * Safe for production:
  * - No Faker (a dev-only dependency), so it runs with `composer install --no-dev`.
- * - No account with a known password. The two demo actors get random
- *   passwords nobody knows; visitors explore by signing up as Staff.
+ * - No password in the code. The admin and staff demo accounts get their
+ *   passwords from DEMO_ADMIN_PASSWORD / DEMO_STAFF_PASSWORD, or random ones
+ *   nobody knows when those are not set (see SyncDemoAccounts).
  * - Every stock change goes through the real action classes, so the ledger,
  *   balances and audit trail are exactly what the application would produce.
  * - The clock is moved back for each step, so the history spans four months
@@ -87,25 +87,13 @@ class DemoDataSeeder extends Seeder
         Carbon::setTestNow($this->today->copy()->subDays($daysAgo)->setTime($hour, $minute));
     }
 
+    /**
+     * The demo history is performed by the demo sign-in accounts, so a
+     * presenter logged in as them sees "their" shipments and recalls.
+     */
     private function createActors(): void
     {
-        $this->operations = $this->actor('Demo Operations Team', 'demo-operations@productsphere.example', UserRole::Staff);
-        $this->quality = $this->actor('Demo Quality Lead', 'demo-quality@productsphere.example', UserRole::Admin);
-    }
-
-    private function actor(string $name, string $email, UserRole $role): User
-    {
-        $user = new User([
-            'name' => $name,
-            'email' => $email,
-            // Random and discarded: nobody can sign in as a demo actor.
-            'password' => Str::password(40),
-        ]);
-        $user->role = $role;
-        $user->email_verified_at = now();
-        $user->save();
-
-        return $user;
+        ['admin' => $this->quality, 'staff' => $this->operations] = app(SyncDemoAccounts::class)->handle();
     }
 
     private function createSupplyChain(): void
