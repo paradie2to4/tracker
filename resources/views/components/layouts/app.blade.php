@@ -30,6 +30,11 @@
                         <li><x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link></li>
                         <li><x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">Products</x-nav-link></li>
                         <li><x-nav-link :href="route('batches.index')" :active="request()->routeIs('batches.*')">Batches</x-nav-link></li>
+                        <li><x-nav-link :href="route('shipments.index')" :active="request()->routeIs('shipments.*')">Shipments</x-nav-link></li>
+                        <li><x-nav-link :href="route('organizations.index')" :active="request()->routeIs('organizations.*', 'locations.*')">Supply chain</x-nav-link></li>
+                        @can('viewAny', App\Models\AuditLog::class)
+                            <li><x-nav-link :href="route('audit.index')" :active="request()->routeIs('audit.*')">Audit log</x-nav-link></li>
+                        @endcan
                     </ul>
                 </nav>
 

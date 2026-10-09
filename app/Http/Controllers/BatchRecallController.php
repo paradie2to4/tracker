@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RecallBatchRequest;
 use App\Models\Batch;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 
 /**
@@ -33,6 +34,12 @@ class BatchRecallController extends Controller
                 ->route('batches.show', $batch)
                 ->with('error', 'This batch has already been recalled.');
         }
+
+        // A query-builder update fires no model events, so the recall is
+        // audited explicitly.
+        AuditLogger::record('batch.recalled', $batch, null, [
+            'recall_reason' => $request->validated('recall_reason'),
+        ], $request->user());
 
         return redirect()
             ->route('batches.show', $batch)

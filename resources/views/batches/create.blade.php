@@ -6,6 +6,13 @@
                 <a href="{{ route('products.create') }}" class="btn btn-primary">Register product</a>
             </x-empty-state>
         </div>
+    @elseif ($locations->isEmpty())
+        <div class="card max-w-3xl">
+            <x-empty-state title="No active locations"
+                           message="A batch's stock must start at a location, such as the factory where it was produced. Add an organisation and a location first.">
+                <a href="{{ route('organizations.index') }}" class="btn btn-primary">Go to supply chain</a>
+            </x-empty-state>
+        </div>
     @else
         <form method="POST" action="{{ route('batches.store') }}" class="card max-w-3xl" novalidate>
             @csrf
@@ -17,6 +24,13 @@
                                    placeholder="Select a product…"
                                    hint="Only active products are listed."
                                    :options="$products->mapWithKeys(fn ($p) => [$p->id => $p->product_code.' — '.$p->name.' ('.$p->unit_of_measure->value.')'])->all()" />
+                </div>
+
+                <div class="sm:col-span-2">
+                    <x-form.select name="origin_location_id" label="Production location" required
+                                   placeholder="Select where the batch was produced…"
+                                   hint="The full initial quantity is placed in stock at this location."
+                                   :options="$locations->mapWithKeys(fn ($l) => [$l->id => $l->label().' ('.$l->organization->name.')'])->all()" />
                 </div>
 
                 <div class="sm:col-span-2">

@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Batches\RegisterBatch;
 use App\Enums\BatchStatus;
+use App\Enums\RemovalReason;
+use App\Enums\ShipmentStatus;
 use App\Http\Requests\StoreBatchRequest;
 use App\Http\Requests\UpdateBatchRequest;
 use App\Models\Batch;
+use App\Models\Location;
 use App\Models\Product;
+use App\Models\ShipmentItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -49,29 +54,55 @@ class BatchController extends Controller
         return view('batches.create', [
             'batch' => new Batch(['product_id' => $request->integer('product') ?: null]),
             'products' => Product::where('is_active', true)->orderBy('name')->get(['id', 'name', 'product_code', 'unit_of_measure']),
+            'locations' => Location::where('is_active', true)->with('organization')->orderBy('code')->get(),
         ]);
     }
 
-    public function store(StoreBatchRequest $request): RedirectResponse
+    public function store(StoreBatchRequest $request, RegisterBatch $register): RedirectResponse
     {
-        $data = $request->validated();
-        // A new batch starts with all of its stock available.
-        $data['current_quantity'] = $data['initial_quantity'];
-
-        $batch = Batch::create($data);
+        $batch = $register->handle($request->validated(), $request->user());
 
         return redirect()
             ->route('batches.show', $batch)
             ->with('success', "Batch {$batch->batch_number} has been registered.");
     }
 
+    /**
+     * The traceability view of a batch: where its stock is now, what is in
+     * transit, and every movement that got it there.
+     */
     public function show(Batch $batch): View
     {
         Gate::authorize('view', $batch);
 
-        $batch->load(['product', 'recalledBy']);
+        $batch->load(['product', 'recalledBy', 'originLocation.organization']);
 
-        return view('batches.show', ['batch' => $batch]);
+        $balances = $batch->stockBalances()
+            ->where('quantity', '>', 0)
+            ->with('location.organization')
+            ->orderByDesc('quantity')
+            ->get();
+
+        $inTransit = ShipmentItem::query()
+            ->where('batch_id', $batch->getKey())
+            ->whereHas('shipment', fn ($query) => $query->where('status', ShipmentStatus::InTransit))
+            ->with('shipment.fromLocation', 'shipment.toLocation')
+            ->get();
+
+        return view('batches.show', [
+            'batch' => $batch,
+            'balances' => $balances,
+            'inTransit' => $inTransit,
+            'movements' => $batch->stockMovements()
+                ->with(['fromLocation', 'toLocation', 'shipment.fromLocation', 'shipment.toLocation', 'user'])
+                ->latest('occurred_at')
+                ->latest('id')
+                ->paginate(15, pageName: 'history'),
+            'removalReasons' => RemovalReason::cases(),
+            'activeLocations' => $batch->origin_location_id === null
+                ? Location::where('is_active', true)->with('organization')->orderBy('code')->get()
+                : collect(),
+        ]);
     }
 
     public function edit(Batch $batch): View

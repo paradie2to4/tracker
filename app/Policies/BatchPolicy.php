@@ -34,4 +34,21 @@ class BatchPolicy
     {
         return $user->isAdmin() && ! $batch->isRecalled();
     }
+
+    /**
+     * Any user may record stock leaving the chain (sales, damage...).
+     * Every removal is attributed in the ledger and the audit trail.
+     */
+    public function removeStock(User $user, Batch $batch): bool
+    {
+        return ! $batch->isEmpty() && $batch->origin_location_id !== null;
+    }
+
+    /**
+     * Batches registered before stock tracking need a starting location.
+     */
+    public function assignOpeningStock(User $user, Batch $batch): bool
+    {
+        return $user->isAdmin() && $batch->origin_location_id === null;
+    }
 }

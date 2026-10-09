@@ -35,6 +35,8 @@ class StoreBatchRequest extends FormRequest
         return [
             // Batches can only be registered for active products.
             'product_id' => ['required', 'integer', Rule::exists('products', 'id')->where('is_active', true)],
+            // Where the batch was produced; its initial stock is placed here.
+            'origin_location_id' => ['required', 'integer', Rule::exists('locations', 'id')->where('is_active', true)],
             'batch_number' => ['required', 'string', 'max:50', 'regex:'.StoreProductRequest::CODE_PATTERN, Rule::unique('batches', 'batch_number')],
             // Future production planning is not supported yet.
             'manufacturing_date' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
@@ -50,6 +52,7 @@ class StoreBatchRequest extends FormRequest
     {
         return [
             'product_id.exists' => 'Select an active product.',
+            'origin_location_id.exists' => 'Select an active production location.',
             'batch_number.regex' => 'The batch number may only contain letters, numbers, dots, dashes and underscores, and must start with a letter or number.',
             'batch_number.unique' => 'A batch with this number already exists.',
             'manufacturing_date.before_or_equal' => 'The manufacturing date cannot be in the future.',
@@ -66,6 +69,7 @@ class StoreBatchRequest extends FormRequest
     {
         return [
             'product_id' => 'product',
+            'origin_location_id' => 'production location',
             'initial_quantity' => 'initial quantity',
             'current_quantity' => 'current quantity',
             'manufacturing_date' => 'manufacturing date',

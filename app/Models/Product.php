@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProductCategory;
 use App\Enums\UnitOfMeasure;
+use App\Models\Concerns\Auditable;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
-    use HasFactory;
+    use Auditable, HasFactory;
 
     /**
      * The model's default values for attributes.

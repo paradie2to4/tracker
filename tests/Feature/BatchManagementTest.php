@@ -2,8 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\MovementType;
 use App\Models\Batch;
+use App\Models\Location;
 use App\Models\Product;
+use App\Models\StockBalance;
+use App\Models\StockMovement;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,12 +22,15 @@ class BatchManagementTest extends TestCase
 
     private Product $product;
 
+    private Location $plant;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->staff = User::factory()->create();
         $this->product = Product::factory()->create();
+        $this->plant = Location::factory()->create();
     }
 
     /**
@@ -33,6 +40,7 @@ class BatchManagementTest extends TestCase
     {
         return array_merge([
             'product_id' => $this->product->id,
+            'origin_location_id' => $this->plant->id,
             'batch_number' => 'LOT-2026-0001',
             'manufacturing_date' => today()->subDays(10)->toDateString(),
             'expiry_date' => today()->addYear()->toDateString(),
@@ -60,8 +68,35 @@ class BatchManagementTest extends TestCase
         $this->assertSame($this->product->id, $batch->product_id);
         $this->assertSame('LOT-2026-0001', $batch->batch_number);
         $this->assertSame('1250.500', $batch->initial_quantity);
-        // A new batch starts with all of its stock available.
+        // A new batch starts with all of its stock available...
         $this->assertSame('1250.500', $batch->current_quantity);
+
+        // ...placed at the production location, explained by a ledger entry.
+        $balance = StockBalance::sole();
+        $this->assertSame($this->plant->id, $balance->location_id);
+        $this->assertSame('1250.500', $balance->quantity);
+
+        $movement = StockMovement::sole();
+        $this->assertSame(MovementType::Production, $movement->type);
+        $this->assertSame($this->plant->id, $movement->to_location_id);
+        $this->assertSame('1250.500', $movement->quantity);
+        $this->assertSame($this->staff->id, $movement->user_id);
+    }
+
+    public function test_a_production_location_is_required_and_must_be_active(): void
+    {
+        $this->actingAs($this->staff)
+            ->post(route('batches.store'), $this->validPayload(['origin_location_id' => '']))
+            ->assertSessionHasErrors('origin_location_id');
+
+        $closed = Location::factory()->inactive()->create();
+
+        $this->actingAs($this->staff)
+            ->post(route('batches.store'), $this->validPayload(['origin_location_id' => $closed->id]))
+            ->assertSessionHasErrors(['origin_location_id' => 'Select an active production location.']);
+
+        $this->assertSame(0, Batch::count());
+        $this->assertSame(0, StockMovement::count());
     }
 
     public function test_the_expiry_date_is_optional(): void
@@ -145,42 +180,40 @@ class BatchManagementTest extends TestCase
         $this->assertSame(0, Batch::count());
     }
 
-    public function test_a_batch_can_be_updated(): void
+    public function test_the_dates_of_a_batch_can_be_corrected(): void
     {
-        $batch = Batch::factory()->for($this->product)->create(['initial_quantity' => '100.000', 'current_quantity' => '100.000']);
+        $batch = Batch::factory()->for($this->product)->create();
+        $newDate = today()->subDays(3)->toDateString();
 
         $this->actingAs($this->staff)
             ->put(route('batches.update', $batch), [
-                'manufacturing_date' => $batch->manufacturing_date->toDateString(),
+                'manufacturing_date' => $newDate,
                 'expiry_date' => '',
-                'initial_quantity' => '120',
-                'current_quantity' => '80.25',
             ])
             ->assertRedirect(route('batches.show', $batch));
 
         $batch->refresh();
-        $this->assertSame('120.000', $batch->initial_quantity);
-        $this->assertSame('80.250', $batch->current_quantity);
+        $this->assertSame($newDate, $batch->manufacturing_date->toDateString());
         $this->assertNull($batch->expiry_date);
     }
 
-    public function test_the_current_quantity_cannot_exceed_the_initial_quantity_or_be_negative(): void
+    public function test_quantities_cannot_be_edited_directly_once_stock_is_tracked(): void
     {
         $batch = Batch::factory()->create(['initial_quantity' => '100.000', 'current_quantity' => '100.000']);
-        $payload = [
-            'manufacturing_date' => $batch->manufacturing_date->toDateString(),
-            'initial_quantity' => '100',
-        ];
 
         $this->actingAs($this->staff)
-            ->put(route('batches.update', $batch), [...$payload, 'current_quantity' => '100.001'])
-            ->assertSessionHasErrors(['current_quantity' => 'The current quantity cannot exceed the initial quantity.']);
+            ->put(route('batches.update', $batch), [
+                'manufacturing_date' => $batch->manufacturing_date->toDateString(),
+                'initial_quantity' => '500',
+                'current_quantity' => '1',
+            ])
+            ->assertSessionHasNoErrors();
 
-        $this->actingAs($this->staff)
-            ->put(route('batches.update', $batch), [...$payload, 'current_quantity' => '-1'])
-            ->assertSessionHasErrors('current_quantity');
-
-        $this->assertSame('100.000', $batch->fresh()->current_quantity);
+        // The submitted quantities are ignored: only movements change stock.
+        $batch->refresh();
+        $this->assertSame('100.000', $batch->initial_quantity);
+        $this->assertSame('100.000', $batch->current_quantity);
+        $this->assertSame('100.000', StockBalance::where('batch_id', $batch->id)->sole()->quantity);
     }
 
     public function test_the_product_and_batch_number_cannot_be_changed(): void

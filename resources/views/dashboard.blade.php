@@ -1,5 +1,5 @@
 <x-layouts.app title="Dashboard">
-    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <x-stat-card label="Registered products" :value="$productCount"
                      :description="number_format($activeProductCount).' active'"
                      :href="route('products.index')" />
@@ -11,6 +11,9 @@
                      :href="route('batches.index', ['status' => 'expired'])" />
         <x-stat-card label="Approaching expiry" :value="$expiringSoonCount" :tone="$expiringSoonCount > 0 ? 'warning' : 'default'"
                      :description="'Active batches expiring within '.$warningDays.' days'" />
+        <x-stat-card label="Shipments in transit" :value="$inTransitCount"
+                     description="Dispatched, awaiting receipt"
+                     :href="route('shipments.index', ['status' => 'in_transit'])" />
     </dl>
 
     <section class="card mt-8" aria-labelledby="expiring-heading">

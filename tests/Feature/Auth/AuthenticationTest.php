@@ -24,6 +24,10 @@ class AuthenticationTest extends TestCase
             'create product' => ['/products/create'],
             'batch list' => ['/batches'],
             'create batch' => ['/batches/create'],
+            'shipment list' => ['/shipments'],
+            'create shipment' => ['/shipments/create'],
+            'supply chain' => ['/organizations'],
+            'audit log' => ['/audit-log'],
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BatchStatus;
+use App\Models\Concerns\Auditable;
 use Database\Factories\BatchFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,13 +11,16 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // Recall columns are not fillable: they are only written by the recall action.
-#[Fillable(['product_id', 'batch_number', 'manufacturing_date', 'expiry_date', 'initial_quantity', 'current_quantity'])]
+// current_quantity is set once at creation; afterwards only StockLedger
+// changes it, through stock movements.
+#[Fillable(['product_id', 'origin_location_id', 'batch_number', 'manufacturing_date', 'expiry_date', 'initial_quantity', 'current_quantity'])]
 class Batch extends Model
 {
     /** @use HasFactory<BatchFactory> */
-    use HasFactory;
+    use Auditable, HasFactory;
 
     /**
      * Get the attributes that should be cast.
@@ -49,6 +53,40 @@ class Batch extends Model
     public function recalledBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recalled_by');
+    }
+
+    /**
+     * Where the batch was produced (null for batches registered before Phase 6).
+     *
+     * @return BelongsTo<Location, $this>
+     */
+    public function originLocation(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'origin_location_id');
+    }
+
+    /**
+     * @return HasMany<StockBalance, $this>
+     */
+    public function stockBalances(): HasMany
+    {
+        return $this->hasMany(StockBalance::class);
+    }
+
+    /**
+     * @return HasMany<StockMovement, $this>
+     */
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+
+    /**
+     * @return HasMany<ShipmentItem, $this>
+     */
+    public function shipmentItems(): HasMany
+    {
+        return $this->hasMany(ShipmentItem::class);
     }
 
     /**

@@ -5,21 +5,39 @@ manufacturing batches, and monitoring stock and expiry. It is the foundation
 of a supply-chain traceability platform designed to be adapted to
 businesses operating in Rwanda.
 
-The current release is the **MVP**: authentication, product management,
-batch management and an expiry-aware dashboard. Supply-chain movements are
-planned for the next phase (see [Roadmap](#roadmap)).
+The current release covers the MVP (products, batches, expiry dashboard)
+and **Phase 6, traceability**: supply-chain organisations and locations,
+shipments between them, a transaction-safe stock ledger and an append-only
+audit trail.
 
 ## Features
 
 **Authentication and access**
-- Session-based login and logout (Laravel Fortify), with passwords hashed by bcrypt.
+- Session-based login, logout and public sign-up (Laravel Fortify), with passwords hashed by bcrypt.
 - Login throttling: 5 attempts per minute per email and IP address.
-- No public registration. Accounts are created by an administrator from the command line.
-- Two roles. **Staff** can view, register and edit products and batches. **Administrators** can also activate/deactivate products and recall batches.
+- Two roles. Self-registered users are always **Staff**. **Administrators** are created from the command line with `php artisan app:create-user --admin`.
+- Staff can view everything, register and edit products and batches, dispatch and receive shipments, and record stock removals.
+- Administrators can also activate/deactivate products, recall batches, manage organisations and locations, cancel any shipment, and view the audit log.
 
 **Dashboard**
-- Total products, total batches, expired batches and batches approaching expiry, all calculated from live database records.
+- Total products, total batches, expired batches, batches approaching expiry and shipments in transit, all calculated from live database records.
 - A list of active batches expiring within the warning window (30 days by default).
+
+**Supply chain**
+- Organisations (manufacturers, distributors, wholesalers, retailers, logistics providers) with an optional 9-digit RRA TIN.
+- Locations per organisation (factories, warehouses, distribution centres, shops), with Rwanda's 30 districts.
+- Inactive locations cannot send or receive shipments. Nothing in the ledger can be deleted.
+
+**Shipments and stock**
+- Every batch starts at a production location. Its stock is then tracked per location.
+- A shipment moves one or more batches between two locations: **in transit → received** or **in transit → cancelled** (stock returns to the origin). Received and cancelled are final.
+- Rules: you cannot ship more than is at the origin, ship recalled or expired batches, ship to the same location, use inactive locations, or receive or cancel a shipment twice. If one item is invalid, nothing is dispatched.
+- Stock removals record stock leaving the chain: sold, consumed, damaged, disposed of, lost, or a count correction (losses and corrections need a note).
+- The batch page shows where the stock is now, what is in transit, and the full movement history: the chain of custody.
+
+**Audit trail**
+- Product, batch, organisation and location changes, plus shipment, recall and stock events, are recorded with the user, IP address, and old and new values.
+- Administrators can browse it at `/audit-log`.
 
 **Products**
 - Paginated list with search by name or code, and filters by category and status.
@@ -29,10 +47,10 @@ planned for the next phase (see [Roadmap](#roadmap)).
 
 **Batches**
 - Paginated list with search by batch number, and filters by product and status.
-- Register batches for active products only. Batch numbers are unique.
+- Register batches for active products only, at an active production location. Batch numbers are unique.
 - Validation: the manufacturing date cannot be in the future, the expiry date cannot precede manufacturing, and quantities must be positive with at most three decimals.
-- The product and batch number are immutable after creation.
-- Administrators can recall a batch with a mandatory reason. Recalled batches are frozen.
+- The product, batch number and quantities cannot be edited after creation. Only the dates can be corrected; stock changes only through movements.
+- Administrators can recall a batch with a mandatory reason. Recalled batches cannot be edited or shipped, but their stock can be removed for disposal.
 
 ## Batch status rules
 
@@ -63,20 +81,52 @@ so lists can be filtered and paginated in the database.
 ## Data model
 
 ```
-users ──< batches.recalled_by        (nullable, ON DELETE SET NULL)
-products ──< batches.product_id      (required, ON DELETE RESTRICT)
+products ──< batches >── locations (origin) >── organizations
+                │
+                ├──< stock_balances >── locations       quantity per batch per location
+                ├──< stock_movements                    append-only ledger
+                └──< shipment_items >── shipments >── locations (from, to)
+audit_logs                                              append-only, polymorphic subject
 ```
 
 | Table | Key columns and constraints |
 |---|---|
 | `users` | Laravel defaults + `role` (`admin` / `staff`, CHECK constraint) |
 | `products` | `product_code` UNIQUE, `name`, `description`, `category`, `manufacturer_name`, `unit_of_measure`, `is_active` |
-| `batches` | `batch_number` UNIQUE, `manufacturing_date`, `expiry_date` (nullable), `initial_quantity` / `current_quantity` as `NUMERIC(14,3)`, `recalled_at`, `recall_reason`, `recalled_by` |
+| `batches` | `batch_number` UNIQUE, `origin_location_id`, dates, `initial_quantity` / `current_quantity` as `NUMERIC(14,3)`, recall columns |
+| `organizations` | `name` UNIQUE, `type`, `tin` UNIQUE (nullable), contacts, `is_active` |
+| `locations` | `organization_id`, `code` UNIQUE, `name`, `type`, `district`, `address`, `is_active` |
+| `stock_balances` | UNIQUE (`batch_id`, `location_id`), `quantity` ≥ 0 |
+| `shipments` | `from_location_id` ≠ `to_location_id`, `status`, dispatch/receipt/cancellation timestamps and users |
+| `shipment_items` | UNIQUE (`shipment_id`, `batch_id`), `quantity` > 0 |
+| `stock_movements` | `type`, `quantity` > 0, `from_location_id` / `to_location_id`, `shipment_id`, `removal_reason`, `user_id`, `occurred_at` |
+| `audit_logs` | `event`, `subject_type` / `subject_id`, `user_id`, `old_values` / `new_values` (JSON), `ip_address` |
 
-PostgreSQL CHECK constraints enforce, independently of the application:
-initial quantity > 0, 0 ≤ current quantity ≤ initial quantity,
-expiry date ≥ manufacturing date, and a recall always has a reason.
-Quantities use exact `NUMERIC`, never floating point.
+PostgreSQL enforces these rules independently of the application:
+- **CHECK constraints:** quantities are never negative, current ≤ initial, expiry ≥ manufacturing, a recall has a reason, a shipment's two locations differ, status-consistent timestamps, and each movement type has exactly the right columns filled.
+- **Triggers:** reject every `UPDATE` and `DELETE` on `stock_movements` and `audit_logs`.
+- **Foreign keys:** use `RESTRICT`, so nothing that appears in the history can be deleted.
+
+Quantities use exact `NUMERIC`, never floating point. PHP-side arithmetic uses `brick/math`.
+
+## How stock stays consistent
+
+Every stock operation (register batch, dispatch, receive, cancel, remove) is an
+action class in `app/Actions` that runs inside **one database transaction**:
+the balance change, the ledger entry, the shipment status change and the audit
+entry are committed together or not at all.
+
+Concurrent operations are made safe with row locks (`SELECT ... FOR UPDATE`),
+always taken in the same order (shipment, then batches by ID, then balances)
+to avoid deadlocks:
+- Two people shipping the last 10 units at the same time: the second waits for the first, then sees 0 available and is rejected.
+- Two people pressing "Mark as received" at once: the shipment row is locked, so the second sees it is already received.
+
+The invariant, which is covered by the tests:
+`sum(stock at locations) + sum(in transit) = batch.current_quantity = produced − removed`.
+
+Batches created before Phase 6 have no location. An administrator assigns
+their opening stock once, from the batch page.
 
 ## Prerequisites
 
@@ -215,14 +265,14 @@ Notes:
 
 ## Current limitations
 
-- Single organisation: all users see all records. Organisation-level access arrives with Phase 6/7.
-- `current_quantity` is edited manually. It will become read-only once stock movements exist.
+- **No organisation-level access yet.** Users are not linked to an organisation, so any signed-in user (including self-registered Staff) can see all records and dispatch from or receive at any location. Phase 7 adds this.
+- Shipments are received in full. There are no partial receipts or discrepancy reports yet.
+- Quantity typos are corrected with a "stock count correction" removal; there is no way to increase stock other than production.
 - No password reset or profile page yet (needs a configured mailer).
-- No user-management screen; users are created with `app:create-user`.
-- A recall is irreversible and has no workflow (notifications, affected shipments).
-- No audit trail of edits yet.
+- No user-management screen; administrators are created with `app:create-user`.
+- A recall is irreversible and has no workflow (notifications, affected-shipment reports).
 
 ## Roadmap
 
-- **Phase 6 — Traceability:** supply-chain organisations and locations, shipment and receipt events, product movement history, transaction-safe stock movements, an append-only audit trail, and rules against invalid transitions.
+- **Phase 6 — Traceability:** ✅ done (organisations, locations, shipments, stock ledger, audit trail).
 - **Phase 7 — Advanced:** QR codes and public product verification, recall workflows and affected-batch reports, role-based organisational access, a documented REST API with authentication and rate limiting, Docker and CI/CD, and optional GS1/EPCIS-based interoperability.

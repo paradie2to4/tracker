@@ -6,12 +6,13 @@ use App\Models\Batch;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
- * The product and batch number are identifiers and cannot be changed after
- * creation, so they are simply absent from these rules: validated() will
- * never contain them, even if a client submits them.
+ * Only the dates of a batch can be corrected after registration.
  *
- * current_quantity is editable during the MVP only. Once stock movements
- * exist (Phase 6) it will be maintained exclusively by movement records.
+ * - The product, batch number and origin are permanent identifiers.
+ * - Quantities are maintained exclusively by stock movements (shipments,
+ *   removals), so the ledger always explains the current balance. They are
+ *   absent from these rules, so validated() never contains them even if a
+ *   client submits them.
  */
 class UpdateBatchRequest extends StoreBatchRequest
 {
@@ -38,21 +39,6 @@ class UpdateBatchRequest extends StoreBatchRequest
         return [
             'manufacturing_date' => $rules['manufacturing_date'],
             'expiry_date' => $rules['expiry_date'],
-            'initial_quantity' => $rules['initial_quantity'],
-            'current_quantity' => ['required', 'numeric', 'decimal:0,3', 'min:0', 'lte:initial_quantity'],
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            ...parent::messages(),
-            'current_quantity.min' => 'The current quantity cannot be negative.',
-            'current_quantity.lte' => 'The current quantity cannot exceed the initial quantity.',
-            'current_quantity.decimal' => 'Quantities may have at most 3 decimal places.',
         ];
     }
 }

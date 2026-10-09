@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BatchStatus;
+use App\Enums\ShipmentStatus;
 use App\Models\Batch;
 use App\Models\Product;
+use App\Models\Shipment;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -21,6 +23,7 @@ class DashboardController extends Controller
             'expiredCount' => Batch::withStatus(BatchStatus::Expired)->count(),
             'expiringSoonCount' => Batch::expiringWithin($warningDays)->count(),
             'recalledCount' => Batch::withStatus(BatchStatus::Recalled)->count(),
+            'inTransitCount' => Shipment::where('status', ShipmentStatus::InTransit)->count(),
             'expiringSoon' => Batch::expiringWithin($warningDays)
                 ->with('product')
                 ->orderBy('expiry_date')
