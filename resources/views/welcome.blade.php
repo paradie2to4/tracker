@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ config('app.name') }} · Product traceability for Rwandan supply chains</title>
         <meta name="description" content="Register products and batches, ship them between locations, and trace any batch from factory to shelf with a tamper-proof stock ledger.">
+        @include('partials.head-icons')
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
