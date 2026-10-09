@@ -22,6 +22,7 @@ use App\Models\Shipment;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -69,6 +70,8 @@ class DemoDataSeeder extends Seeder
             DB::transaction(function () {
                 $this->at(130);
                 $this->createActors();
+                // Attribute model changes (audit trail) to the demo staff account.
+                Auth::setUser($this->operations);
                 $this->createSupplyChain();
                 $this->createProducts();
                 $this->registerBatches();
@@ -76,6 +79,7 @@ class DemoDataSeeder extends Seeder
             });
         } finally {
             Carbon::setTestNow();
+            Auth::forgetUser();
         }
     }
 

@@ -16,7 +16,7 @@ class AuditLogController extends Controller
         $event = trim((string) $request->query('event', ''));
 
         $logs = AuditLog::query()
-            ->with('user')
+            ->with(['user', 'subject'])
             ->when($event !== '', fn ($query) => $query->whereLike('event', "{$event}%"))
             ->latest('created_at')
             ->latest('id')

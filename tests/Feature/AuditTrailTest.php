@@ -70,6 +70,24 @@ class AuditTrailTest extends TestCase
             ->assertSee('Audited product');
     }
 
+    public function test_the_audit_log_reads_as_plain_sentences_without_internal_fields(): void
+    {
+        $admin = User::factory()->admin()->create(['name' => 'Aline Uwase']);
+        $this->actingAs($admin);
+
+        $location = Location::factory()->create(['name' => 'Gikondo depot', 'is_active' => true]);
+        $location->update(['name' => 'Gikondo warehouse']);
+
+        $this->get(route('audit.index'))
+            ->assertOk()
+            ->assertSeeInOrder(['Aline Uwase', 'updated location', 'Gikondo warehouse'])
+            ->assertSee(route('locations.show', $location), false)
+            ->assertSeeInOrder(['Name', 'Gikondo depot', 'Gikondo warehouse'])
+            ->assertSee('Yes')
+            ->assertDontSee('organization_id')
+            ->assertDontSee('is_active');
+    }
+
     public function test_audit_entries_and_stock_movements_cannot_be_changed_through_the_application(): void
     {
         $batch = Batch::factory()->create();

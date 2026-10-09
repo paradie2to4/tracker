@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\BatchStatus;
 use App\Enums\ShipmentStatus;
+use App\Models\AuditLog;
 use App\Models\Batch;
 use App\Models\Organization;
 use App\Models\Shipment;
@@ -36,8 +37,12 @@ class DemoDataTest extends TestCase
 
         $this->assertTrue(Batch::expiringWithin(30)->exists(), 'No demo batch is approaching expiry.');
 
-        // The clock is restored after seeding.
+        // The clock is restored and nobody is left signed in after seeding.
         $this->assertFalse(Carbon::hasTestNow());
+        $this->assertGuest();
+
+        // Audit entries are attributed to a demo account, not "System".
+        $this->assertSame(0, AuditLog::whereNull('user_id')->count());
     }
 
     public function test_the_demo_history_is_spread_over_time(): void
