@@ -7,6 +7,7 @@ use App\Enums\ShipmentStatus;
 use App\Models\Batch;
 use App\Models\Product;
 use App\Models\Shipment;
+use App\Models\StockMovement;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -27,6 +28,12 @@ class DashboardController extends Controller
             'expiringSoon' => Batch::expiringWithin($warningDays)
                 ->with('product')
                 ->orderBy('expiry_date')
+                ->limit(8)
+                ->get(),
+            'recentMovements' => StockMovement::query()
+                ->with(['batch.product', 'fromLocation', 'toLocation', 'shipment.fromLocation', 'shipment.toLocation', 'user'])
+                ->latest('occurred_at')
+                ->latest('id')
                 ->limit(8)
                 ->get(),
         ]);

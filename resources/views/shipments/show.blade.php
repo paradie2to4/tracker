@@ -17,53 +17,53 @@
         <h2 id="shipment-details-heading" class="sr-only">Shipment details</h2>
         <dl class="grid grid-cols-1 gap-x-6 gap-y-5 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
             <div>
-                <dt class="text-sm text-slate-500">Status</dt>
+                <dt class="text-sm text-ink-500">Status</dt>
                 <dd class="mt-1"><x-shipment-status :status="$shipment->status" /></dd>
             </div>
             <div>
-                <dt class="text-sm text-slate-500">From</dt>
+                <dt class="text-sm text-ink-500">From</dt>
                 <dd class="mt-1 text-sm">
                     <a href="{{ route('locations.show', $shipment->fromLocation) }}" class="link">{{ $shipment->fromLocation->name }}</a>
-                    <span class="block text-xs text-slate-500">{{ $shipment->fromLocation->organization->name }}</span>
+                    <span class="block text-xs text-ink-500">{{ $shipment->fromLocation->organization->name }}</span>
                 </dd>
             </div>
             <div>
-                <dt class="text-sm text-slate-500">To</dt>
+                <dt class="text-sm text-ink-500">To</dt>
                 <dd class="mt-1 text-sm">
                     <a href="{{ route('locations.show', $shipment->toLocation) }}" class="link">{{ $shipment->toLocation->name }}</a>
-                    <span class="block text-xs text-slate-500">{{ $shipment->toLocation->organization->name }}</span>
+                    <span class="block text-xs text-ink-500">{{ $shipment->toLocation->organization->name }}</span>
                 </dd>
             </div>
             <div class="sm:col-span-2 lg:col-span-3">
-                <dt class="text-sm text-slate-500">Notes</dt>
-                <dd class="mt-1 text-sm whitespace-pre-line text-slate-900">{{ $shipment->notes ?: '—' }}</dd>
+                <dt class="text-sm text-ink-500">Notes</dt>
+                <dd class="mt-1 text-sm whitespace-pre-line text-ink-900">{{ $shipment->notes ?: '—' }}</dd>
             </div>
         </dl>
     </section>
 
     <section class="card mt-8" aria-labelledby="timeline-heading">
-        <div class="border-b border-slate-200 px-4 py-4 sm:px-6">
-            <h2 id="timeline-heading" class="text-base font-semibold text-slate-900">Timeline</h2>
+        <div class="border-b border-ink-200 px-4 py-4 sm:px-6">
+            <h2 id="timeline-heading" class="text-base font-semibold text-ink-900">Timeline</h2>
         </div>
         <ol class="space-y-4 p-4 text-sm sm:p-6">
             <li>
-                <span class="font-medium text-slate-900">Dispatched</span>
+                <span class="font-medium text-ink-900">Dispatched</span>
                 from {{ $shipment->fromLocation->name }} by {{ $shipment->dispatchedBy->name }}
-                <time class="block text-slate-500" datetime="{{ $shipment->dispatched_at->toIso8601String() }}">{{ $shipment->dispatched_at->format('d M Y, H:i') }}</time>
+                <time class="block text-ink-500" datetime="{{ $shipment->dispatched_at->toIso8601String() }}">{{ $shipment->dispatched_at->format('d M Y, H:i') }}</time>
             </li>
             @if ($shipment->received_at)
                 <li>
                     <span class="font-medium text-emerald-700">Received</span>
                     at {{ $shipment->toLocation->name }} by {{ $shipment->receivedBy->name }}
-                    <time class="block text-slate-500" datetime="{{ $shipment->received_at->toIso8601String() }}">{{ $shipment->received_at->format('d M Y, H:i') }}</time>
+                    <time class="block text-ink-500" datetime="{{ $shipment->received_at->toIso8601String() }}">{{ $shipment->received_at->format('d M Y, H:i') }}</time>
                 </li>
             @endif
             @if ($shipment->cancelled_at)
                 <li>
-                    <span class="font-medium text-slate-700">Cancelled</span>
+                    <span class="font-medium text-ink-700">Cancelled</span>
                     by {{ $shipment->cancelledBy->name }}; stock returned to {{ $shipment->fromLocation->name }}
-                    <time class="block text-slate-500" datetime="{{ $shipment->cancelled_at->toIso8601String() }}">{{ $shipment->cancelled_at->format('d M Y, H:i') }}</time>
-                    <p class="mt-1 whitespace-pre-line text-slate-700"><span class="font-medium">Reason:</span> {{ $shipment->cancellation_reason }}</p>
+                    <time class="block text-ink-500" datetime="{{ $shipment->cancelled_at->toIso8601String() }}">{{ $shipment->cancelled_at->format('d M Y, H:i') }}</time>
+                    <p class="mt-1 whitespace-pre-line text-ink-700"><span class="font-medium">Reason:</span> {{ $shipment->cancellation_reason }}</p>
                 </li>
             @endif
             @if ($shipment->isInTransit())
@@ -73,12 +73,12 @@
     </section>
 
     <section class="card mt-8" aria-labelledby="items-heading">
-        <div class="border-b border-slate-200 px-4 py-4 sm:px-6">
-            <h2 id="items-heading" class="text-base font-semibold text-slate-900">Items</h2>
+        <div class="border-b border-ink-200 px-4 py-4 sm:px-6">
+            <h2 id="items-heading" class="text-base font-semibold text-ink-900">Items</h2>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
-                <thead class="bg-slate-50">
+            <table class="min-w-full divide-y divide-ink-200">
+                <thead class="bg-ink-50">
                     <tr>
                         <th scope="col" class="table-header">Batch</th>
                         <th scope="col" class="table-header">Product</th>
@@ -86,7 +86,7 @@
                         <th scope="col" class="table-header text-right">Quantity</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-ink-100">
                     @foreach ($shipment->items as $item)
                         <tr>
                             <td class="table-cell"><a href="{{ route('batches.show', $item->batch) }}" class="link font-mono">{{ $item->batch->batch_number }}</a></td>
@@ -101,12 +101,12 @@
     </section>
 
     @can('cancel', $shipment)
-        <section class="card mt-8 max-w-3xl border-l-4 border-slate-400" aria-labelledby="cancel-heading">
+        <section class="card mt-8 max-w-3xl border-l-4 border-ink-400" aria-labelledby="cancel-heading">
             <form method="POST" action="{{ route('shipments.cancellation.store', $shipment) }}" class="p-4 sm:p-6" novalidate
                   data-confirm="Cancel {{ $shipment->reference }} and return all items to {{ $shipment->fromLocation->name }}? This cannot be undone.">
                 @csrf
-                <h2 id="cancel-heading" class="text-base font-semibold text-slate-900">Cancel shipment</h2>
-                <p class="mt-1 text-sm text-slate-500">Returns every item to {{ $shipment->fromLocation->name }}. The dispatch stays in the history.</p>
+                <h2 id="cancel-heading" class="text-base font-semibold text-ink-900">Cancel shipment</h2>
+                <p class="mt-1 text-sm text-ink-500">Returns every item to {{ $shipment->fromLocation->name }}. The dispatch stays in the history.</p>
                 <div class="mt-4">
                     <x-form.textarea name="cancellation_reason" label="Reason for cancelling" required rows="2" maxlength="1000"
                                      hint="At least 10 characters." />

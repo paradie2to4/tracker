@@ -27,40 +27,40 @@
         <h2 id="details-heading" class="sr-only">Product details</h2>
         <dl class="grid grid-cols-1 gap-x-6 gap-y-5 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
             <div>
-                <dt class="text-sm text-slate-500">Product code</dt>
-                <dd class="mt-1 font-mono text-sm font-medium text-slate-900">{{ $product->product_code }}</dd>
+                <dt class="text-sm text-ink-500">Product code</dt>
+                <dd class="mt-1 font-mono text-sm font-medium text-ink-900">{{ $product->product_code }}</dd>
             </div>
             <div>
-                <dt class="text-sm text-slate-500">Status</dt>
+                <dt class="text-sm text-ink-500">Status</dt>
                 <dd class="mt-1"><x-product-status :active="$product->is_active" /></dd>
             </div>
             <div>
-                <dt class="text-sm text-slate-500">Category</dt>
-                <dd class="mt-1 text-sm text-slate-900">{{ $product->category->label() }}</dd>
+                <dt class="text-sm text-ink-500">Category</dt>
+                <dd class="mt-1 text-sm text-ink-900">{{ $product->category->label() }}</dd>
             </div>
             <div>
-                <dt class="text-sm text-slate-500">Manufacturer</dt>
-                <dd class="mt-1 text-sm text-slate-900">{{ $product->manufacturer_name }}</dd>
+                <dt class="text-sm text-ink-500">Manufacturer</dt>
+                <dd class="mt-1 text-sm text-ink-900">{{ $product->manufacturer_name }}</dd>
             </div>
             <div>
-                <dt class="text-sm text-slate-500">Unit of measure</dt>
-                <dd class="mt-1 text-sm text-slate-900">{{ $product->unit_of_measure->label() }}</dd>
+                <dt class="text-sm text-ink-500">Unit of measure</dt>
+                <dd class="mt-1 text-sm text-ink-900">{{ $product->unit_of_measure->label() }}</dd>
             </div>
             <div>
-                <dt class="text-sm text-slate-500">Registered</dt>
-                <dd class="mt-1 text-sm text-slate-900">{{ $product->created_at->format('d M Y, H:i') }}</dd>
+                <dt class="text-sm text-ink-500">Registered</dt>
+                <dd class="mt-1 text-sm text-ink-900">{{ $product->created_at->format('d M Y, H:i') }}</dd>
             </div>
             <div class="sm:col-span-2 lg:col-span-3">
-                <dt class="text-sm text-slate-500">Description</dt>
-                <dd class="mt-1 text-sm whitespace-pre-line text-slate-900">{{ $product->description ?: '—' }}</dd>
+                <dt class="text-sm text-ink-500">Description</dt>
+                <dd class="mt-1 text-sm whitespace-pre-line text-ink-900">{{ $product->description ?: '—' }}</dd>
             </div>
         </dl>
     </section>
 
     <section class="card mt-8" aria-labelledby="batches-heading">
-        <div class="border-b border-slate-200 px-4 py-4 sm:px-6">
-            <h2 id="batches-heading" class="text-base font-semibold text-slate-900">Batches</h2>
-            <p class="mt-1 text-sm text-slate-500">{{ number_format($batches->total()) }} {{ Str::plural('batch', $batches->total()) }} registered for this product.</p>
+        <div class="border-b border-ink-200 px-4 py-4 sm:px-6">
+            <h2 id="batches-heading" class="text-base font-semibold text-ink-900">Batches</h2>
+            <p class="mt-1 text-sm text-ink-500">{{ number_format($batches->total()) }} {{ Str::plural('batch', $batches->total()) }} registered for this product.</p>
         </div>
 
         @if ($batches->isEmpty())
@@ -72,8 +72,8 @@
             </x-empty-state>
         @else
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50">
+                <table class="min-w-full divide-y divide-ink-200">
+                    <thead class="bg-ink-50">
                         <tr>
                             <th scope="col" class="table-header">Batch number</th>
                             <th scope="col" class="table-header">Manufactured</th>
@@ -82,9 +82,9 @@
                             <th scope="col" class="table-header">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-ink-100">
                         @foreach ($batches as $batch)
-                            <tr class="hover:bg-slate-50">
+                            <tr class="hover:bg-ink-50">
                                 <td class="table-cell"><a href="{{ route('batches.show', $batch) }}" class="link font-mono">{{ $batch->batch_number }}</a></td>
                                 <td class="table-cell">{{ $batch->manufacturing_date->format('d M Y') }}</td>
                                 <td class="table-cell">{{ $batch->expiry_date?->format('d M Y') ?? 'No expiry' }}</td>
@@ -99,7 +99,7 @@
             </div>
 
             @if ($batches->hasPages())
-                <div class="border-t border-slate-200 px-4 py-3">{{ $batches->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $batches->links() }}</div>
             @endif
         @endif
     </section>

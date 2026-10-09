@@ -7,10 +7,10 @@
 @endphp
 
 <div>
-    <label for="{{ $id }}" class="block text-sm font-medium text-slate-700">
+    <label for="{{ $id }}" class="block text-sm font-medium text-ink-700">
         {{ $label }}
         @unless ($required)
-            <span class="font-normal text-slate-400">(optional)</span>
+            <span class="font-normal text-ink-400">(optional)</span>
         @endunless
     </label>
     <input
@@ -24,7 +24,7 @@
         {{ $attributes->except('id')->class('form-control mt-1.5') }}
     >
     @if ($hint)
-        <p id="{{ $id }}-hint" class="mt-1.5 text-xs text-slate-500">{{ $hint }}</p>
+        <p id="{{ $id }}-hint" class="mt-1.5 text-xs text-ink-500">{{ $hint }}</p>
     @endif
     @if ($hasError)
         <p id="{{ $id }}-error" class="mt-1.5 text-sm text-red-600">{{ $errors->first($name) }}</p>

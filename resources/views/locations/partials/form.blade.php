@@ -10,8 +10,8 @@
 
     @php($selectedDistrict = old('district', $location->district))
     <div>
-        <label for="district" class="block text-sm font-medium text-slate-700">
-            District <span class="font-normal text-slate-400">(optional)</span>
+        <label for="district" class="block text-sm font-medium text-ink-700">
+            District <span class="font-normal text-ink-400">(optional)</span>
         </label>
         <select id="district" name="district" class="form-control mt-1.5"
                 @error('district') aria-invalid="true" aria-describedby="district-error" @enderror>
@@ -37,12 +37,12 @@
     @if ($location->exists)
         <div class="sm:col-span-2">
             <input type="hidden" name="is_active" value="0">
-            <label class="flex items-center gap-2 text-sm text-slate-700">
+            <label class="flex items-center gap-2 text-sm text-ink-700">
                 <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $location->is_active))
-                       class="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600">
+                       class="size-4 rounded border-ink-300 text-brand-600 focus:ring-brand-600">
                 Active
             </label>
-            <p class="mt-1 text-xs text-slate-500">Inactive locations cannot send or receive new shipments. Stock already there remains on record.</p>
+            <p class="mt-1 text-xs text-ink-500">Inactive locations cannot send or receive new shipments. Stock already there remains on record.</p>
         </div>
     @endif
 </div>

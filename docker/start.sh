@@ -22,4 +22,9 @@ chown -R www-data:www-data storage bootstrap/cache
 # With a single web instance there is no risk of two containers migrating at once.
 php artisan migrate --force
 
+# Load the demo supply chain once (does nothing if it is already there).
+if [ "${SEED_DEMO_DATA:-false}" = "true" ]; then
+    php artisan app:seed-demo
+fi
+
 exec apache2-foreground

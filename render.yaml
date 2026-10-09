@@ -46,3 +46,6 @@ services:
         value: database
       - key: BCRYPT_ROUNDS
         value: "12"
+      # Loads the demo supply chain on first boot (idempotent; no known-password accounts).
+      - key: SEED_DEMO_DATA
+        value: "true"

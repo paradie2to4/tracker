@@ -9,11 +9,11 @@
 
     <form method="GET" action="{{ route('batches.index') }}" role="search" class="card mb-6 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-[2fr_2fr_1fr_auto] lg:items-end">
         <div>
-            <label for="q" class="block text-sm font-medium text-slate-700">Batch number</label>
+            <label for="q" class="block text-sm font-medium text-ink-700">Batch number</label>
             <input type="search" id="q" name="q" value="{{ $filters['q'] }}" placeholder="Search by batch number" maxlength="50" class="form-control mt-1.5">
         </div>
         <div>
-            <label for="product" class="block text-sm font-medium text-slate-700">Product</label>
+            <label for="product" class="block text-sm font-medium text-ink-700">Product</label>
             <select id="product" name="product" class="form-control mt-1.5">
                 <option value="">All products</option>
                 @foreach ($products as $product)
@@ -22,7 +22,7 @@
             </select>
         </div>
         <div>
-            <label for="status" class="block text-sm font-medium text-slate-700">Status</label>
+            <label for="status" class="block text-sm font-medium text-ink-700">Status</label>
             <select id="status" name="status" class="form-control mt-1.5">
                 <option value="">All statuses</option>
                 @foreach ($statuses as $status)
@@ -49,8 +49,8 @@
             @endif
         @else
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50">
+                <table class="min-w-full divide-y divide-ink-200">
+                    <thead class="bg-ink-50">
                         <tr>
                             <th scope="col" class="table-header">Batch number</th>
                             <th scope="col" class="table-header">Product</th>
@@ -60,13 +60,13 @@
                             <th scope="col" class="table-header">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-ink-100">
                         @foreach ($batches as $batch)
-                            <tr class="hover:bg-slate-50">
+                            <tr class="hover:bg-ink-50">
                                 <td class="table-cell"><a href="{{ route('batches.show', $batch) }}" class="link font-mono">{{ $batch->batch_number }}</a></td>
                                 <td class="table-cell">
                                     <a href="{{ route('products.show', $batch->product) }}" class="hover:underline">{{ $batch->product->name }}</a>
-                                    <span class="block font-mono text-xs text-slate-500">{{ $batch->product->product_code }}</span>
+                                    <span class="block font-mono text-xs text-ink-500">{{ $batch->product->product_code }}</span>
                                 </td>
                                 <td class="table-cell">{{ $batch->manufacturing_date->format('d M Y') }}</td>
                                 <td class="table-cell">
@@ -84,7 +84,7 @@
             </div>
 
             @if ($batches->hasPages())
-                <div class="border-t border-slate-200 px-4 py-3">{{ $batches->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $batches->links() }}</div>
             @endif
         @endif
     </div>

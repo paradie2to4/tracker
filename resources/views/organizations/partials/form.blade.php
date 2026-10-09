@@ -18,12 +18,12 @@
     @if ($organization->exists)
         <div class="sm:col-span-2">
             <input type="hidden" name="is_active" value="0">
-            <label class="flex items-center gap-2 text-sm text-slate-700">
+            <label class="flex items-center gap-2 text-sm text-ink-700">
                 <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $organization->is_active))
-                       class="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600">
+                       class="size-4 rounded border-ink-300 text-brand-600 focus:ring-brand-600">
                 Active
             </label>
-            <p class="mt-1 text-xs text-slate-500">Marks an organisation you no longer work with. Its history is kept. To stop shipments to or from it, also deactivate its locations.</p>
+            <p class="mt-1 text-xs text-ink-500">Marks an organisation you no longer work with. Its history is kept. To stop shipments to or from it, also deactivate its locations.</p>
         </div>
     @endif
 </div>

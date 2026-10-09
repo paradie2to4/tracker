@@ -38,7 +38,7 @@ enum BatchStatus: string
             self::Active => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
             self::Expired => 'bg-amber-50 text-amber-800 ring-amber-600/20',
             self::Recalled => 'bg-red-50 text-red-700 ring-red-600/20',
-            self::Depleted => 'bg-slate-100 text-slate-600 ring-slate-500/20',
+            self::Depleted => 'bg-ink-100 text-ink-600 ring-ink-500/20',
         };
     }
 }

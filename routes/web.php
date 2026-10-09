@@ -12,11 +12,12 @@ use App\Http\Controllers\ProductStatusController;
 use App\Http\Controllers\ShipmentCancellationController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\ShipmentReceiptController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
 // Login, logout and registration routes are registered by Laravel Fortify.
 
-Route::redirect('/', '/dashboard');
+Route::get('/', WelcomeController::class)->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');

@@ -9,11 +9,11 @@
 
     <form method="GET" action="{{ route('shipments.index') }}" role="search" class="card mb-6 grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-[1fr_2fr_1fr_auto] lg:items-end">
         <div>
-            <label for="q" class="block text-sm font-medium text-slate-700">Reference</label>
+            <label for="q" class="block text-sm font-medium text-ink-700">Reference</label>
             <input type="search" id="q" name="q" value="{{ $filters['q'] }}" placeholder="e.g. SHP-000042" maxlength="20" class="form-control mt-1.5">
         </div>
         <div>
-            <label for="location" class="block text-sm font-medium text-slate-700">Location (origin or destination)</label>
+            <label for="location" class="block text-sm font-medium text-ink-700">Location (origin or destination)</label>
             <select id="location" name="location" class="form-control mt-1.5">
                 <option value="">All locations</option>
                 @foreach ($locations as $location)
@@ -22,7 +22,7 @@
             </select>
         </div>
         <div>
-            <label for="status" class="block text-sm font-medium text-slate-700">Status</label>
+            <label for="status" class="block text-sm font-medium text-ink-700">Status</label>
             <select id="status" name="status" class="form-control mt-1.5">
                 <option value="">All statuses</option>
                 @foreach ($statuses as $status)
@@ -49,8 +49,8 @@
             @endif
         @else
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50">
+                <table class="min-w-full divide-y divide-ink-200">
+                    <thead class="bg-ink-50">
                         <tr>
                             <th scope="col" class="table-header">Reference</th>
                             <th scope="col" class="table-header">From</th>
@@ -60,16 +60,16 @@
                             <th scope="col" class="table-header">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-ink-100">
                         @foreach ($shipments as $shipment)
-                            <tr class="hover:bg-slate-50">
+                            <tr class="hover:bg-ink-50">
                                 <td class="table-cell"><a href="{{ route('shipments.show', $shipment) }}" class="link font-mono">{{ $shipment->reference }}</a></td>
                                 <td class="table-cell">{{ $shipment->fromLocation->name }}</td>
                                 <td class="table-cell">{{ $shipment->toLocation->name }}</td>
                                 <td class="table-cell text-right tabular-nums">{{ $shipment->items_count }}</td>
                                 <td class="table-cell">
                                     {{ $shipment->dispatched_at->format('d M Y, H:i') }}
-                                    <span class="block text-xs text-slate-500">by {{ $shipment->dispatchedBy->name }}</span>
+                                    <span class="block text-xs text-ink-500">by {{ $shipment->dispatchedBy->name }}</span>
                                 </td>
                                 <td class="table-cell"><x-shipment-status :status="$shipment->status" /></td>
                             </tr>
@@ -79,7 +79,7 @@
             </div>
 
             @if ($shipments->hasPages())
-                <div class="border-t border-slate-200 px-4 py-3">{{ $shipments->links() }}</div>
+                <div class="border-t border-ink-200 px-4 py-3">{{ $shipments->links() }}</div>
             @endif
         @endif
     </div>

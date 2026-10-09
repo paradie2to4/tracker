@@ -12,6 +12,10 @@ audit trail.
 
 ## Features
 
+**Public site**
+- A landing page explaining the product, with live platform figures, then sign-up and login screens in the same design.
+- The design uses a deep navy base, cobalt for actions, and the sky blue and sun yellow of the Rwandan flag as accents. The font is Plus Jakarta Sans.
+
 **Authentication and access**
 - Session-based login, logout and public sign-up (Laravel Fortify), with passwords hashed by bcrypt.
 - Login throttling: 5 attempts per minute per email and IP address.
@@ -177,16 +181,21 @@ Edit `.env` (never commit it):
 php artisan migrate
 ```
 
-Optionally load demo data (local environment only):
+### Demo data
 
-```bash
-php artisan db:seed
-```
+The demo supply chain is fictional but realistic: 8 Rwandan organisations,
+10 products, 13 batches and four months of shipments, sales, a recall and a
+cancellation. Every batch status appears.
 
-The seeder creates `admin@productsphere.test` and `staff@productsphere.test`,
-both with the password `password`, plus sample products and batches in every
-status. These accounts exist only for local development. The seeder refuses
-to run unless `APP_ENV=local`.
+| Command | Where | What it does |
+|---|---|---|
+| `php artisan db:seed` | Local only | Creates `admin@productsphere.test` and `staff@productsphere.test` (password `password`), then loads the demo supply chain. Refuses to run unless `APP_ENV=local`. |
+| `php artisan app:seed-demo` | Anywhere, including production | Loads the demo supply chain **once**, and does nothing on later runs. Creates no account with a known password, so visitors explore by signing up. |
+
+`DemoDataSeeder` uses only the real action classes (no Faker, which is not
+installed in production), so its ledger and audit trail are exactly what the
+application itself would produce. It moves the clock back for each step, so
+the history looks like four months of real activity.
 
 ### Create a real user account
 
@@ -260,7 +269,7 @@ backed by a [Neon](https://neon.tech) serverless PostgreSQL database.
 
 Notes:
 - The free Render plan sleeps after 15 minutes of inactivity. The first request after that takes up to about a minute.
-- Do not run `php artisan db:seed` against production. The seeder refuses to run outside `APP_ENV=local`.
+- Set `SEED_DEMO_DATA=true` to load the demo supply chain on the first deploy (`start.sh` runs `app:seed-demo`, which is idempotent). `php artisan db:seed` refuses to run in production because it creates known-password accounts.
 - Vercel is not used: the app is a server-rendered Laravel monolith with no separate front end to host.
 
 ## Current limitations

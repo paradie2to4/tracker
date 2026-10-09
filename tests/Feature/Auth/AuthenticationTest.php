@@ -51,9 +51,11 @@ class AuthenticationTest extends TestCase
         $this->assertSame(1, Product::count());
     }
 
-    public function test_the_home_page_redirects_to_the_dashboard(): void
+    public function test_signed_in_users_skip_the_welcome_page(): void
     {
-        $this->get('/')->assertRedirect('/dashboard');
+        $this->actingAs(User::factory()->create())
+            ->get('/')
+            ->assertRedirect('/dashboard');
     }
 
     public function test_the_login_page_can_be_rendered(): void
