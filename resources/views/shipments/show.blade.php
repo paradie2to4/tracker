@@ -10,7 +10,7 @@
     </x-slot:actions>
 
     @error('shipment')
-        <div role="alert" class="mb-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200">{{ $message }}</div>
+        <div role="alert" class="mb-6 rounded-md bg-clay-50 px-4 py-3 text-sm text-clay-800 ring-1 ring-clay-200">{{ $message }}</div>
     @enderror
 
     <section class="card" aria-labelledby="shipment-details-heading">
@@ -53,7 +53,7 @@
             </li>
             @if ($shipment->received_at)
                 <li>
-                    <span class="font-medium text-emerald-700">Received</span>
+                    <span class="font-medium text-brand-700">Received</span>
                     at {{ $shipment->toLocation->name }} by {{ $shipment->receivedBy->name }}
                     <time class="block text-ink-500" datetime="{{ $shipment->received_at->toIso8601String() }}">{{ $shipment->received_at->format('d M Y, H:i') }}</time>
                 </li>
@@ -67,7 +67,7 @@
                 </li>
             @endif
             @if ($shipment->isInTransit())
-                <li class="text-sky-700">In transit — awaiting receipt at {{ $shipment->toLocation->name }}.</li>
+                <li class="text-brand-700">In transit — awaiting receipt at {{ $shipment->toLocation->name }}.</li>
             @endif
         </ol>
     </section>
@@ -101,7 +101,7 @@
     </section>
 
     @can('cancel', $shipment)
-        <section class="card mt-8 max-w-3xl border-l-4 border-ink-400" aria-labelledby="cancel-heading">
+        <section class="mt-8 max-w-3xl rounded-3xl bg-ink-100/70" aria-labelledby="cancel-heading">
             <form method="POST" action="{{ route('shipments.cancellation.store', $shipment) }}" class="p-4 sm:p-6" novalidate
                   data-confirm="Cancel {{ $shipment->reference }} and return all items to {{ $shipment->fromLocation->name }}? This cannot be undone.">
                 @csrf

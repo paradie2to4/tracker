@@ -14,7 +14,7 @@ audit trail.
 
 **Public site**
 - A landing page explaining the product, with live platform figures, then sign-up and login screens in the same design.
-- The design uses a deep navy base, cobalt for actions, and the sky blue and sun yellow of the Rwandan flag as accents. The font is Plus Jakarta Sans.
+- A calm, minimal design: warm cream backgrounds, white rounded cards, soft sage panels, deep forest green for primary actions and selected states, and faint gold line accents. Status colours are muted (sage, honey, clay). The font is Outfit.
 
 **Authentication and access**
 - Session-based login, logout and public sign-up (Laravel Fortify), with passwords hashed by bcrypt.

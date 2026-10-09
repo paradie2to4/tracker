@@ -14,7 +14,7 @@ class WelcomePageTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('Know where every batch is.')
+            ->assertSee('Know where every batch is,')
             ->assertSee(route('register'))
             ->assertSee(route('login'));
     }

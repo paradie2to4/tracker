@@ -1,22 +1,28 @@
 @props(['label', 'value', 'href' => null, 'tone' => 'default', 'description' => null])
 
 @php
-    [$valueClasses, $accent] = match ($tone) {
-        'warning' => ['text-amber-700', 'from-sun-400 to-amber-500'],
-        'danger' => ['text-red-700', 'from-red-500 to-rose-400'],
-        'info' => ['text-sky-700', 'from-sky-400 to-brand-500'],
-        default => ['text-ink-900', 'from-brand-600 to-sky-500'],
+    [$valueClasses, $dot] = match ($tone) {
+        'warning' => ['text-honey-700', 'bg-honey-500'],
+        'danger' => ['text-clay-600', 'bg-clay-500'],
+        'info' => ['text-brand-700', 'bg-gold-400'],
+        default => ['text-ink-900', 'bg-brand-400'],
     };
 @endphp
 
-<div class="card relative overflow-hidden p-5">
-    <span class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r {{ $accent }}" aria-hidden="true"></span>
-    <dt class="text-sm font-semibold text-ink-500">{{ $label }}</dt>
-    <dd class="mt-2 text-3xl font-extrabold tracking-tight tabular-nums {{ $valueClasses }}">{{ number_format($value) }}</dd>
+<div class="card flex flex-col p-6">
+    <div class="flex items-center justify-between gap-2">
+        <dt class="flex items-center gap-2 text-sm text-ink-500">
+            <span class="size-1.5 rounded-full {{ $dot }}" aria-hidden="true"></span>
+            {{ $label }}
+        </dt>
+        @if ($href)
+            <a href="{{ $href }}" class="-m-1.5 rounded-full p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-800" aria-label="View {{ Str::lower($label) }}">
+                <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z" clip-rule="evenodd" /></svg>
+            </a>
+        @endif
+    </div>
+    <dd class="mt-4 text-4xl font-medium tracking-tight tabular-nums {{ $valueClasses }}">{{ number_format($value) }}</dd>
     @if ($description)
-        <p class="mt-1 text-xs text-ink-400">{{ $description }}</p>
-    @endif
-    @if ($href)
-        <a href="{{ $href }}" class="link mt-3 inline-block text-sm">View<span class="sr-only"> {{ Str::lower($label) }}</span> →</a>
+        <p class="mt-1.5 text-xs text-ink-400">{{ $description }}</p>
     @endif
 </div>

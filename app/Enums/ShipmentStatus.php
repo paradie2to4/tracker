@@ -28,8 +28,8 @@ enum ShipmentStatus: string
     public function badgeClasses(): string
     {
         return match ($this) {
-            self::InTransit => 'bg-sky-50 text-sky-700 ring-sky-600/20',
-            self::Received => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+            self::InTransit => 'bg-honey-50 text-honey-700 ring-honey-600/20',
+            self::Received => 'bg-brand-50 text-brand-700 ring-brand-600/20',
             self::Cancelled => 'bg-ink-100 text-ink-600 ring-ink-500/20',
         };
     }

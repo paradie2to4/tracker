@@ -32,6 +32,6 @@
         <p id="{{ $id }}-hint" class="mt-1.5 text-xs text-ink-500">{{ $hint }}</p>
     @endif
     @if ($hasError)
-        <p id="{{ $id }}-error" class="mt-1.5 text-sm text-red-600">{{ $errors->first($name) }}</p>
+        <p id="{{ $id }}-error" class="mt-1.5 text-sm text-clay-600">{{ $errors->first($name) }}</p>
     @endif
 </div>

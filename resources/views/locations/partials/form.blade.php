@@ -25,7 +25,7 @@
             @endforeach
         </select>
         @error('district')
-            <p id="district-error" class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+            <p id="district-error" class="mt-1.5 text-sm text-clay-600">{{ $message }}</p>
         @enderror
     </div>
 

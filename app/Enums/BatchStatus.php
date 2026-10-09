@@ -35,9 +35,9 @@ enum BatchStatus: string
     public function badgeClasses(): string
     {
         return match ($this) {
-            self::Active => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
-            self::Expired => 'bg-amber-50 text-amber-800 ring-amber-600/20',
-            self::Recalled => 'bg-red-50 text-red-700 ring-red-600/20',
+            self::Active => 'bg-brand-50 text-brand-700 ring-brand-600/20',
+            self::Expired => 'bg-honey-50 text-honey-800 ring-honey-600/20',
+            self::Recalled => 'bg-clay-50 text-clay-700 ring-clay-600/20',
             self::Depleted => 'bg-ink-100 text-ink-600 ring-ink-500/20',
         };
     }

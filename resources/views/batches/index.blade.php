@@ -72,7 +72,7 @@
                                 <td class="table-cell">
                                     {{ $batch->expiry_date?->format('d M Y') ?? 'No expiry' }}
                                     @if ($batch->isApproachingExpiry())
-                                        <span class="block text-xs font-medium text-amber-700">Expires in {{ $batch->daysUntilExpiry() }} {{ Str::plural('day', $batch->daysUntilExpiry()) }}</span>
+                                        <span class="block text-xs font-medium text-honey-700">Expires in {{ $batch->daysUntilExpiry() }} {{ Str::plural('day', $batch->daysUntilExpiry()) }}</span>
                                     @endif
                                 </td>
                                 <td class="table-cell text-right tabular-nums">{{ App\Support\Quantity::format($batch->current_quantity) }} {{ $batch->product->unit_of_measure->value }}</td>

@@ -96,7 +96,7 @@
                             · <x-movement-description :movement="$movement" />
                         </div>
                         <div class="flex items-baseline gap-4 text-ink-500">
-                            <span class="tabular-nums font-medium {{ $movement->type->direction() > 0 ? 'text-emerald-700' : 'text-red-700' }}">
+                            <span class="tabular-nums font-medium {{ $movement->type->direction() > 0 ? 'text-brand-700' : 'text-clay-700' }}">
                                 {{ $movement->type->direction() > 0 ? '+' : '−' }}{{ App\Support\Quantity::format($movement->quantity) }}
                             </span>
                             <time datetime="{{ $movement->occurred_at->toIso8601String() }}">{{ $movement->occurred_at->format('d M Y, H:i') }}</time>

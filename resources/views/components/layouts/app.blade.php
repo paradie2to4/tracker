@@ -25,15 +25,15 @@
         </a>
 
         <div class="min-h-full md:flex">
-            <aside class="relative isolate overflow-hidden bg-ink-950 text-ink-100 md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0 md:flex-col">
-                <div class="absolute -top-24 -left-24 -z-10 size-72 rounded-full bg-brand-600/25 blur-3xl" aria-hidden="true"></div>
+            <aside class="relative isolate overflow-hidden border-ink-200/70 bg-surface md:sticky md:top-0 md:flex md:h-screen md:w-68 md:shrink-0 md:flex-col md:border-r">
+                <x-deco-lines class="-top-10 -right-24 -z-10 hidden w-80 md:block" />
 
-                <div class="px-4 py-4 md:px-5 md:py-6">
-                    <a href="{{ route('dashboard') }}" aria-label="{{ config('app.name') }} dashboard"><x-logo dark /></a>
+                <div class="px-4 py-4 md:px-6 md:py-7">
+                    <a href="{{ route('dashboard') }}" aria-label="{{ config('app.name') }} dashboard"><x-logo /></a>
                 </div>
 
-                <nav aria-label="Main" class="px-2 pb-3 md:flex-1 md:overflow-y-auto md:px-3 md:pb-0">
-                    <p class="hidden px-3 pb-2 text-[11px] font-bold tracking-[0.16em] text-ink-400 uppercase md:block">Workspace</p>
+                <nav aria-label="Main" class="px-2 pb-3 md:flex-1 md:overflow-y-auto md:px-4 md:pb-0">
+                    <p class="hidden px-4 pb-2 text-xs text-ink-400 md:block">Workspace</p>
                     <ul class="flex gap-1 overflow-x-auto md:flex-col">
                         @foreach ($navigation as [$label, $route, $patterns, $icon])
                             <li><x-nav-link :href="route($route)" :active="request()->routeIs(...$patterns)" :icon="$icon">{{ $label }}</x-nav-link></li>
@@ -47,19 +47,19 @@
                     </ul>
                 </nav>
 
-                <div class="flex items-center justify-between gap-3 border-t border-white/10 px-4 py-3 md:px-5 md:py-4">
+                <div class="m-3 flex items-center justify-between gap-3 rounded-3xl bg-ink-100/70 px-3 py-3 md:m-4">
                     <div class="flex min-w-0 items-center gap-3">
-                        <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-sky-500 text-sm font-bold text-white" aria-hidden="true">
+                        <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-200 text-sm font-medium text-brand-900" aria-hidden="true">
                             {{ Str::upper(Str::substr(auth()->user()->name, 0, 1)) }}
                         </span>
                         <div class="min-w-0 text-sm">
-                            <p class="truncate font-semibold text-white">{{ auth()->user()->name }}</p>
-                            <p class="truncate text-xs {{ auth()->user()->isAdmin() ? 'text-sun-400' : 'text-ink-400' }}">{{ auth()->user()->role->label() }}</p>
+                            <p class="truncate font-medium text-ink-900">{{ auth()->user()->name }}</p>
+                            <p class="truncate text-xs text-ink-500">{{ auth()->user()->role->label() }}</p>
                         </div>
                     </div>
                     <form method="POST" action="{{ route('logout') }}" class="shrink-0">
                         @csrf
-                        <button type="submit" class="rounded-lg px-2.5 py-1.5 text-sm font-medium whitespace-nowrap text-ink-300 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-400">
+                        <button type="submit" class="rounded-full px-3 py-1.5 text-sm whitespace-nowrap text-ink-600 hover:bg-surface hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-brand-700">
                             Log out
                         </button>
                     </form>
@@ -67,16 +67,16 @@
             </aside>
 
             <div class="min-w-0 flex-1 bg-canvas">
-                <header class="sticky top-0 z-20 border-b border-ink-100 bg-white/85 backdrop-blur">
-                    <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
-                        <h1 class="text-xl font-extrabold tracking-tight text-ink-900">{{ $title }}</h1>
+                <header class="sticky top-0 z-20 bg-canvas/85 backdrop-blur">
+                    <div class="flex flex-wrap items-center justify-between gap-3 px-4 pt-6 pb-4 sm:px-6 lg:px-10">
+                        <h1 class="text-2xl font-medium tracking-tight text-ink-900">{{ $title }}</h1>
                         @isset($actions)
                             <div class="flex flex-wrap items-center gap-2">{{ $actions }}</div>
                         @endisset
                     </div>
                 </header>
 
-                <main id="main" class="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                <main id="main" class="px-4 pt-2 pb-10 sm:px-6 lg:px-10">
                     <x-flash />
                     {{ $slot }}
                 </main>

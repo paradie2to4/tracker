@@ -9,45 +9,53 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="h-full bg-white font-sans text-ink-800 antialiased">
-        <div class="flex min-h-full">
+    <body class="h-full bg-canvas font-sans text-ink-800 antialiased">
+        <div class="flex min-h-full gap-4 p-4">
             {{-- Brand panel (large screens). --}}
-            <aside class="relative isolate hidden w-[44%] max-w-2xl overflow-hidden bg-ink-950 text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
-                <div class="bg-grid-dark absolute inset-0 -z-10" aria-hidden="true"></div>
-                <div class="absolute -top-32 -left-32 -z-10 size-[28rem] rounded-full bg-brand-600/35 blur-3xl" aria-hidden="true"></div>
-                <div class="absolute -right-24 bottom-0 -z-10 size-80 rounded-full bg-sky-500/20 blur-3xl" aria-hidden="true"></div>
+            <aside class="panel relative isolate hidden w-[46%] max-w-2xl flex-col justify-between overflow-hidden p-12 lg:flex">
+                <x-deco-lines class="-top-6 -right-10 -z-10 w-[28rem]" />
 
-                <a href="{{ route('home') }}" aria-label="{{ config('app.name') }} home"><x-logo dark size="lg" /></a>
+                <a href="{{ route('home') }}" aria-label="{{ config('app.name') }} home"><x-logo size="lg" /></a>
 
                 <div>
-                    <p class="text-3xl leading-tight font-extrabold tracking-tight text-balance">
-                        Every batch. Every location.
-                        <span class="text-sun-400">Every movement.</span>
+                    {{-- A small, quiet product preview. --}}
+                    <div class="card max-w-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-ink-500">Batch UM-MAIZE-2026-031</p>
+                            <span class="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs text-brand-800">Active</span>
+                        </div>
+                        <p class="mt-3 text-3xl font-medium tracking-tight text-ink-900 tabular-nums">710 <span class="text-base font-normal text-ink-400">bags in the chain</span></p>
+                        <div class="mt-5 flex items-center gap-2 text-xs text-ink-500">
+                            @foreach (['Masoro mill', 'Kigali warehouse', 'Musanze shop'] as $i => $stop)
+                                @if ($i > 0)
+                                    <span class="h-px flex-1 bg-ink-200" aria-hidden="true"></span>
+                                @endif
+                                <span class="flex items-center gap-1.5 whitespace-nowrap">
+                                    <span class="size-2 rounded-full {{ $i === 2 ? 'bg-gold-400' : 'bg-brand-700' }}" aria-hidden="true"></span>
+                                    {{ $stop }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <p class="mt-10 max-w-md text-3xl leading-tight font-medium tracking-tight text-brand-950">
+                        Every batch, every location, every movement.
                     </p>
-                    <ul class="mt-8 space-y-4 text-ink-200">
-                        @foreach ([
-                            'See where your stock is right now, across every warehouse and shop.',
-                            'Ship, receive and recall with a ledger that cannot be rewritten.',
-                            'Answer “where did this batch go?” in seconds, not days.',
-                        ] as $point)
-                            <li class="flex gap-3">
-                                <span class="mt-2 size-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true"></span>
-                                {{ $point }}
-                            </li>
-                        @endforeach
-                    </ul>
+                    <p class="mt-4 max-w-md text-brand-800/80">
+                        See where your stock is right now, and the full history of how it got there.
+                    </p>
                 </div>
 
-                <p class="text-sm text-ink-400">Product traceability for Rwandan supply chains.</p>
+                <p class="text-sm text-brand-800/70">Product traceability for Rwandan supply chains</p>
             </aside>
 
             {{-- Form panel. --}}
-            <main class="flex flex-1 flex-col justify-center bg-canvas px-4 py-12 sm:px-6 lg:px-16">
+            <main class="flex flex-1 flex-col justify-center px-2 py-10 sm:px-6 lg:px-16">
                 <div class="mx-auto w-full max-w-md">
                     <a href="{{ route('home') }}" class="mb-10 inline-block lg:hidden" aria-label="{{ config('app.name') }} home"><x-logo /></a>
 
                     @if ($heading)
-                        <h1 class="text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">{{ $heading }}</h1>
+                        <h1 class="text-3xl font-medium tracking-tight text-ink-900">{{ $heading }}</h1>
                     @endif
                     @if ($subheading)
                         <p class="mt-2 text-ink-500">{{ $subheading }}</p>

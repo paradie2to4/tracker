@@ -8,16 +8,16 @@
     </x-slot:actions>
 
     @if ($batch->isRecalled())
-        <div role="alert" class="mb-6 rounded-md bg-red-50 p-4 ring-1 ring-red-200">
-            <h2 class="text-sm font-semibold text-red-800">This batch has been recalled</h2>
-            <p class="mt-1 text-sm text-red-700">
+        <div role="alert" class="mb-6 rounded-md bg-clay-50 p-4 ring-1 ring-clay-200">
+            <h2 class="text-sm font-semibold text-clay-800">This batch has been recalled</h2>
+            <p class="mt-1 text-sm text-clay-700">
                 Recalled on {{ $batch->recalled_at->format('d M Y, H:i') }}{{ $batch->recalledBy ? ' by '.$batch->recalledBy->name : '' }}.
                 Recalled batches can no longer be edited.
             </p>
-            <p class="mt-2 text-sm whitespace-pre-line text-red-800"><span class="font-medium">Reason:</span> {{ $batch->recall_reason }}</p>
+            <p class="mt-2 text-sm whitespace-pre-line text-clay-800"><span class="font-medium">Reason:</span> {{ $batch->recall_reason }}</p>
         </div>
     @elseif ($batch->isApproachingExpiry())
-        <div role="status" class="mb-6 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
+        <div role="status" class="mb-6 rounded-md bg-honey-50 px-4 py-3 text-sm text-honey-800 ring-1 ring-honey-200">
             @php($days = $batch->daysUntilExpiry())
             {{ $days === 0 ? 'This batch expires today.' : "This batch expires in {$days} ".Str::plural('day', $days).'.' }}
         </div>
@@ -76,7 +76,7 @@
     </section>
 
     @if ($batch->origin_location_id === null)
-        <section class="card mt-8 max-w-3xl border-l-4 border-amber-500" aria-labelledby="opening-heading">
+        <section class="mt-8 max-w-3xl rounded-3xl bg-honey-50" aria-labelledby="opening-heading">
             <div class="p-4 sm:p-6">
                 <h2 id="opening-heading" class="text-base font-semibold text-ink-900">Stock location not recorded</h2>
                 <p class="mt-1 text-sm text-ink-600">
@@ -127,7 +127,7 @@
                                 </tr>
                             @endforeach
                             @foreach ($inTransit as $item)
-                                <tr class="bg-sky-50/50">
+                                <tr class="bg-brand-50/50">
                                     <td class="table-cell" colspan="2">
                                         In transit:
                                         <a href="{{ route('shipments.show', $item->shipment) }}" class="link font-mono">{{ $item->shipment->reference }}</a>
@@ -167,7 +167,7 @@
                                 @endif
                             </div>
                             <div class="flex items-baseline gap-4 text-ink-500">
-                                <span class="tabular-nums font-medium {{ $movement->type->direction() > 0 ? 'text-emerald-700' : 'text-red-700' }}">
+                                <span class="tabular-nums font-medium {{ $movement->type->direction() > 0 ? 'text-brand-700' : 'text-clay-700' }}">
                                     {{ $movement->type->direction() > 0 ? '+' : '−' }}{{ App\Support\Quantity::format($movement->quantity) }}
                                 </span>
                                 <span>
@@ -218,7 +218,7 @@
     @endif
 
     @can('recall', $batch)
-        <section class="card mt-8 max-w-3xl border-l-4 border-red-500" aria-labelledby="recall-heading">
+        <section class="mt-8 max-w-3xl rounded-3xl bg-clay-50" aria-labelledby="recall-heading">
             <form method="POST" action="{{ route('batches.recall', $batch) }}" class="p-4 sm:p-6" novalidate
                   data-confirm="Recall batch {{ $batch->batch_number }}? This cannot be undone.">
                 @csrf

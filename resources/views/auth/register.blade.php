@@ -1,6 +1,6 @@
 <x-layouts.guest title="Sign up" heading="Create your account" subheading="Explore a working supply chain in under a minute.">
     @if ($errors->any())
-        <div role="alert" class="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200">
+        <div role="alert" class="mb-6 rounded-2xl bg-clay-50 px-5 py-3.5 text-sm text-clay-800">
             <ul class="list-inside list-disc space-y-0.5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -13,26 +13,26 @@
         @csrf
 
         <div>
-            <label for="name" class="block text-sm font-semibold text-ink-700">Full name</label>
+            <label for="name" class="block text-sm font-medium text-ink-600">Full name</label>
             <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name"
                    @error('name') aria-invalid="true" @enderror class="form-control mt-1.5 py-2.5">
         </div>
 
         <div>
-            <label for="email" class="block text-sm font-semibold text-ink-700">Email address</label>
+            <label for="email" class="block text-sm font-medium text-ink-600">Email address</label>
             <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="username"
                    @error('email') aria-invalid="true" @enderror class="form-control mt-1.5 py-2.5">
         </div>
 
         <div>
-            <label for="password" class="block text-sm font-semibold text-ink-700">Password</label>
+            <label for="password" class="block text-sm font-medium text-ink-600">Password</label>
             <input id="password" name="password" type="password" required autocomplete="new-password" aria-describedby="password-hint"
                    @error('password') aria-invalid="true" @enderror class="form-control mt-1.5 py-2.5">
             <p id="password-hint" class="mt-1.5 text-xs text-ink-400">At least 10 characters, including letters and numbers.</p>
         </div>
 
         <div>
-            <label for="password_confirmation" class="block text-sm font-semibold text-ink-700">Confirm password</label>
+            <label for="password_confirmation" class="block text-sm font-medium text-ink-600">Confirm password</label>
             <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password"
                    class="form-control mt-1.5 py-2.5">
         </div>

@@ -1,18 +1,17 @@
 <x-layouts.app title="Dashboard">
-    <section class="relative mb-8 overflow-hidden rounded-2xl bg-ink-950 px-6 py-7 text-white sm:px-8" aria-labelledby="welcome-heading">
-        <div class="bg-grid-dark absolute inset-0" aria-hidden="true"></div>
-        <div class="absolute -top-24 -right-16 size-72 rounded-full bg-brand-600/40 blur-3xl" aria-hidden="true"></div>
-        <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <section class="panel relative isolate mb-6 overflow-hidden px-7 py-8 sm:px-9" aria-labelledby="welcome-heading">
+        <x-deco-lines class="-top-16 right-0 -z-10 w-96" />
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div class="max-w-2xl">
-                <h2 id="welcome-heading" class="text-2xl font-extrabold tracking-tight">Welcome, {{ Str::before(auth()->user()->name, ' ') }}</h2>
-                <p class="mt-2 text-ink-200">
+                <h2 id="welcome-heading" class="text-2xl font-medium tracking-tight text-brand-950">Welcome, {{ Str::before(auth()->user()->name, ' ') }}</h2>
+                <p class="mt-2 text-brand-900/75">
                     This is your supply chain at a glance. Open any batch to see where its stock is right now and every
                     movement that got it there, or follow a recalled batch to see which locations are affected.
                 </p>
             </div>
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('batches.index', ['status' => 'recalled']) }}" class="btn btn-accent">Trace a recalled batch</a>
-                <a href="{{ route('shipments.create') }}" class="btn btn-ghost-dark">New shipment</a>
+                <a href="{{ route('batches.index', ['status' => 'recalled']) }}" class="btn btn-primary">Trace a recalled batch</a>
+                <a href="{{ route('shipments.create') }}" class="btn btn-secondary">New shipment</a>
             </div>
         </div>
     </section>
@@ -63,7 +62,7 @@
                                 <td class="table-cell">{{ $batch->product->name }}</td>
                                 <td class="table-cell">{{ $batch->expiry_date->format('d M Y') }}</td>
                                 <td class="table-cell">
-                                    <span class="font-medium {{ $days <= 7 ? 'text-red-700' : 'text-amber-700' }}">
+                                    <span class="font-medium {{ $days <= 7 ? 'text-clay-700' : 'text-honey-700' }}">
                                         {{ $days === 0 ? 'Expires today' : $days.' '.Str::plural('day', $days) }}
                                     </span>
                                 </td>
@@ -97,7 +96,7 @@
                             <p class="mt-0.5"><x-movement-description :movement="$movement" /></p>
                         </div>
                         <div class="flex items-baseline gap-4 text-ink-500">
-                            <span class="font-semibold tabular-nums {{ $movement->type->direction() > 0 ? 'text-emerald-700' : 'text-red-700' }}">
+                            <span class="font-semibold tabular-nums {{ $movement->type->direction() > 0 ? 'text-brand-700' : 'text-clay-700' }}">
                                 {{ $movement->type->direction() > 0 ? '+' : '−' }}{{ App\Support\Quantity::format($movement->quantity) }}
                             </span>
                             <time datetime="{{ $movement->occurred_at->toIso8601String() }}" title="{{ $movement->occurred_at->format('d M Y, H:i') }}">{{ $movement->occurred_at->diffForHumans() }}</time>

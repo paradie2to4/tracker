@@ -35,7 +35,7 @@
                     <h2 class="text-base font-semibold text-ink-900">2. Destination and items</h2>
 
                     @error('from_location_id')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
+                        <p class="text-sm text-clay-600">{{ $message }}</p>
                     @enderror
 
                     <x-form.select name="to_location_id" label="Destination" required placeholder="Select the receiving location…"
@@ -50,7 +50,7 @@
                             <legend class="text-sm font-medium text-ink-700">Quantities to ship</legend>
                             <p class="mt-1 text-xs text-ink-500">Leave a row empty to skip that batch.</p>
                             @error('items')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                <p class="mt-2 text-sm text-clay-600">{{ $message }}</p>
                             @enderror
 
                             <div class="mt-3 overflow-x-auto rounded-md ring-1 ring-ink-200">
@@ -80,7 +80,7 @@
                                                            @error($field) aria-invalid="true" aria-describedby="{{ $inputId }}-error" @enderror
                                                            class="form-control">
                                                     @error($field)
-                                                        <p id="{{ $inputId }}-error" class="mt-1 text-xs text-red-600 whitespace-normal">{{ $message }}</p>
+                                                        <p id="{{ $inputId }}-error" class="mt-1 text-xs text-clay-600 whitespace-normal">{{ $message }}</p>
                                                     @enderror
                                                 </td>
                                             </tr>
