@@ -1,5 +1,7 @@
 <?php
 
+use Laravel\Fortify\Features;
+
 return [
 
     /*
@@ -157,12 +159,12 @@ return [
     |
     */
 
-    // ProductSphere only uses Fortify's login/logout pipeline (always enabled).
-    // Accounts are created by an administrator with `php artisan app:create-user`,
-    // so public registration stays off. Password reset needs a configured
-    // mailer and is planned for a later phase.
+    // ProductSphere uses Fortify's login/logout pipeline (always enabled) plus
+    // public registration. Self-registered users get the Staff role; admins are
+    // created with `php artisan app:create-user --admin`. Password reset needs
+    // a configured mailer and is planned for a later phase.
     'features' => [
-        //
+        Features::registration(),
     ],
 
 ];

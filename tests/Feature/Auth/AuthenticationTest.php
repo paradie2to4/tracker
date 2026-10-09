@@ -113,15 +113,4 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
     }
-
-    public function test_public_registration_is_disabled(): void
-    {
-        $this->get('/register')->assertNotFound();
-        $this->post('/register', [
-            'name' => 'Someone',
-            'email' => 'someone@example.com',
-            'password' => 'password-123',
-            'password_confirmation' => 'password-123',
-        ])->assertNotFound();
-    }
 }

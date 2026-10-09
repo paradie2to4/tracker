@@ -32,7 +32,8 @@
         </form>
     </div>
 
-    <p class="mt-6 text-center text-xs text-slate-500">
-        Accounts are created by an administrator. Contact your administrator if you need access.
+    <p class="mt-6 text-center text-sm text-slate-600">
+        Don't have an account?
+        <a href="{{ route('register') }}" class="font-medium text-indigo-600 hover:text-indigo-500">Sign up</a>
     </p>
 </x-layouts.guest>

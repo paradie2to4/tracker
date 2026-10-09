@@ -15,7 +15,7 @@ use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
 
 /**
- * Public registration is disabled, so accounts are created here.
+ * Public sign-up only creates Staff accounts, so administrators are created here.
  * The password is typed into a hidden prompt and never appears in shell
  * history or command-line arguments.
  */
